@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
@@ -18,6 +19,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -98,7 +100,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String email = mIdView.getText().toString();
+        String id = mIdView.getText().toString();
         String password = mPasswordView.getText().toString();
 
         boolean cancel = false;
@@ -113,11 +115,11 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         }
 
         // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
+        if (TextUtils.isEmpty(id)) {
             mIdView.setError(getString(R.string.error_field_required));
             focusView = mIdView;
             cancel = true;
-        } else if (!isEmailValid(email)) {
+        } else if (!isIDValid(id)) {
             mIdView.setError(getString(R.string.error_invalid_email));
             focusView = mIdView;
             cancel = true;
@@ -131,18 +133,16 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
+            mAuthTask = new UserLoginTask(id, password);
             mAuthTask.execute((Void) null);
         }
     }
 
-    private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.matches("[0-9]+");
+    private boolean isIDValid(String id) {
+        return id.matches("[0-9]+");
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
         return password.length() > 4;
     }
 

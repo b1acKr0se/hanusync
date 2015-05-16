@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainActivity extends ActionBarActivity implements CourseAdapter.OnItemClickListener {
+public class MainActivity extends ActionBarActivity implements CourseAdapter.OnItemClickListener{
 
     String TITLES[] = {"Settings"};
     int ICONS[] = {R.drawable.ic_action_settings};
@@ -87,17 +87,11 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
         Drawer.setDrawerListener(mDrawerToggle); // Drawer Listener set to the Drawer toggle
         mDrawerToggle.syncState();               // Finally we set the drawer toggle sync State
 
-
-        ArrayList<String> arrayList = new ArrayList<>();
-
         courseList = (RecyclerView) findViewById(R.id.courseList);
         courseList.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         courseList.setLayoutManager(llm);
-
-        courseAdapter = new CourseAdapter(arrayList,this);
-        courseList.setAdapter(courseAdapter);
 
     }
 
@@ -143,10 +137,8 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
         @Override
         protected void onPostExecute(ArrayList<String> result) {
             mProgressDialog.dismiss();
-            mAdapter = new NavAdapter(TITLES,ICONS,NAME,ID);       // Creating the Adapter of MyAdapter class(which we are going to see in a bit)
-            // And passing the titles,icons,header view name, header view email,
-            // and header view profile picture
-            mRecyclerView.setAdapter(mAdapter);   // Setting the adapter to RecyclerView
+            mAdapter = new NavAdapter(TITLES,ICONS,NAME,ID);
+            mRecyclerView.setAdapter(mAdapter);
             courseAdapter = new CourseAdapter(result,MainActivity.this);
             courseList.setAdapter(courseAdapter);
         }
@@ -169,32 +161,18 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
         String name = courseAdapter.get(position);
         if(urls.containsKey(name)){
             Intent intent = new Intent(MainActivity.this,CourseActivity.class);
+            String subject = name.substring(name.lastIndexOf(": ")+2,name.length());
+            intent.putExtra("subject",subject);
             intent.putExtra("url",urls.get(name));
+            intent.putExtra("cookies", (java.io.Serializable) cookies);
             MainActivity.this.startActivity(intent);
         } else {
             Toast.makeText(MainActivity.this,"There's an error",Toast.LENGTH_LONG);
         }
     }
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        return true;
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
     }
 }

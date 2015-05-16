@@ -10,11 +10,15 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
@@ -22,14 +26,14 @@ import java.util.ArrayList;
 import java.util.Map;
 
 
-public class CourseActivity extends ActionBarActivity{
+public class CourseActivity extends ActionBarActivity {
 
 
     private Toolbar toolbar;
     private RecyclerView recyclerView;
     private ContentAdapter adapter;
     private ProgressBar progressBar;
-    private Map<String,String> cookies;
+    private Map<String, String> cookies;
 
 
     @Override
@@ -40,6 +44,12 @@ public class CourseActivity extends ActionBarActivity{
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        Intent intent = getIntent();
+        String name = intent.getStringExtra("subject");
+        setTitle(name);
+
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
         recyclerView = (RecyclerView) findViewById(R.id.courseList);
@@ -48,12 +58,32 @@ public class CourseActivity extends ActionBarActivity{
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
 
+        recyclerView.setOnScrollListener(new HidingScrollListener() {
+            @Override
+            public void onHide() {
+                hideViews();
+            }
+
+            @Override
+            public void onShow() {
+                showViews();
+            }
+        });
+
         new GetContent().execute();
     }
 
-    private class GetContent extends AsyncTask<Void,Void,ArrayList<Content>> {
+    private void hideViews() {
+        toolbar.animate().translationY(-toolbar.getHeight()).setInterpolator(new AccelerateInterpolator(2));
+    }
 
-        protected void onPreExecute(){
+    private void showViews() {
+        toolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
+    }
+
+    private class GetContent extends AsyncTask<Void, Void, ArrayList<Content>> {
+
+        protected void onPreExecute() {
             progressBar.setVisibility(ProgressBar.VISIBLE);
         }
 
@@ -61,21 +91,35 @@ public class CourseActivity extends ActionBarActivity{
         protected ArrayList<Content> doInBackground(Void... params) {
             try {
                 Intent intent = getIntent();
-                cookies = (Map<String,String>)intent.getSerializableExtra("cookies");
+                cookies = (Map<String, String>) intent.getSerializableExtra("cookies");
 
                 String url = intent.getStringExtra("url");
 
                 ArrayList<Content> contents = new ArrayList<>();
 
                 Document document = Jsoup.connect(url).cookies(cookies).get();
-                for(int i = 1; i<20;i++) {
-                    Element weekly_content = document.select("table.weeks").select("tr#section-"+i).select("td.content").first();
+
+                Elements weekly_summary = document.select("table.weeks").select("div.summary");
+
+                for (Element e : weekly_summary) {
                     Content content = new Content();
-                    content.date = weekly_content.select("h3.weekdates").text();
-                    content.summary = document.select("table.weeks").select("tr#section-"+i).select("td.content").select("div.summary").text();
+                    content.summary = br2nl(e.html());
                     contents.add(content);
                 }
 
+                Elements weekly_content = document.select("table.weeks").select("h3.weekdates");
+                try {
+                    for (int i = 0; i < weekly_content.size() + 1; i++) {
+                        if (i != 0) {
+                            Content content = contents.get(i);
+                            content.date = br2nl(weekly_content.get(i - 1).html());
+                            System.out.println("Iteration number " + i);
+                        }
+                    }
+                } catch (IndexOutOfBoundsException e) {
+
+                }
+                return contents;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -92,26 +136,29 @@ public class CourseActivity extends ActionBarActivity{
         }
     }
 
-
+    public static String br2nl(String html) {
+        if (html == null)
+            return html;
+        Document document = Jsoup.parse(html);
+        document.outputSettings(new Document.OutputSettings().prettyPrint(false));
+        document.select("br").append("\\n");
+        document.select("p").prepend("\\n\\n");
+        String s = document.html().replaceAll("\\\\n", "\n");
+        return Jsoup.clean(s, "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false));
+    }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_course, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);

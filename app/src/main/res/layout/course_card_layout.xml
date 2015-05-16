@@ -19,19 +19,32 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Name"
-            android:textSize="@dimen/abc_text_size_large_material"
+            android:textSize="@dimen/abc_text_size_medium_material"
             android:textStyle="bold"
             android:layout_marginTop="5dp"
-            android:layout_marginStart="10dp"/>
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"/>
+
+        <RelativeLayout
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/content_time"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/divider" />
 
         <TextView
             android:id="@+id/content_summary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/content_time"
+            android:layout_below="@id/divider"
             android:text="Name"
-            android:textSize="@dimen/abc_text_size_medium_material"
-            android:layout_marginStart="10dp"/>
+            android:textSize="@dimen/abc_text_size_small_material"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"/>
 
         <TextView
             android:id="@+id/content_resources"
@@ -39,8 +52,10 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/content_summary"
             android:text="Name"
-            android:textSize="@dimen/abc_text_size_medium_material"
-            android:layout_marginStart="10dp"/>
+            android:textSize="@dimen/abc_text_size_small_material"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="5dp"/>
     </RelativeLayout>
 
 </android.support.v7.widget.CardView>
