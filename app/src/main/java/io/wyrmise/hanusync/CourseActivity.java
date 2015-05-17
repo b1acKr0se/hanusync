@@ -1,10 +1,9 @@
 package io.wyrmise.hanusync;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -12,8 +11,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.FrameLayout;
 import android.widget.ProgressBar;
+
+import com.liuguangqiang.swipeback.SwipeBackActivity;
+import com.liuguangqiang.swipeback.SwipeBackLayout;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -26,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 
-public class CourseActivity extends ActionBarActivity {
+public class CourseActivity extends SwipeBackActivity {
 
 
     private Toolbar toolbar;
@@ -40,6 +41,8 @@ public class CourseActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_course);
+
+        setDragEdge(SwipeBackLayout.DragEdge.LEFT);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -99,24 +102,26 @@ public class CourseActivity extends ActionBarActivity {
 
                 Document document = Jsoup.connect(url).cookies(cookies).get();
 
-                Elements weekly_summary = document.select("table.weeks").select("div.summary");
+                Elements weekly_content = document.select("table.weeks").select("h3.weekdates");
 
-                for (Element e : weekly_summary) {
+                Content first = new Content();
+                contents.add(first);
+
+                for(Element e:weekly_content){
                     Content content = new Content();
-                    content.summary = br2nl(e.html());
+                    content.date = br2nl(e.html());
                     contents.add(content);
                 }
 
-                Elements weekly_content = document.select("table.weeks").select("h3.weekdates");
-                try {
-                    for (int i = 0; i < weekly_content.size() + 1; i++) {
-                        if (i != 0) {
-                            Content content = contents.get(i);
-                            content.date = br2nl(weekly_content.get(i - 1).html());
-                            System.out.println("Iteration number " + i);
-                        }
+                Elements weekly_summary = document.select("table.weeks").select("div.summary");
+
+                try{
+                    for(int i = 0; i<weekly_summary.size();i++){
+                        Content content = contents.get(i);
+                        content.summary = br2nl(weekly_summary.get(i).html());
+                        System.out.println("Content summary"+content.summary+";");
                     }
-                } catch (IndexOutOfBoundsException e) {
+                }catch(IndexOutOfBoundsException e){
 
                 }
                 return contents;
