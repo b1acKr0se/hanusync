@@ -57,7 +57,7 @@
         <item name="android:verticalSpacing">0dp</item>
     </style>
 
-    <style name="Widget.SampleDashboard.Item" parent="Widget">
+    <style name="Widget.Submission.Item" parent="Widget">
     </style>
 
     <style name="Widget.SampleDashboard.Item.Title" parent="Widget">
@@ -66,6 +66,12 @@
         <item name="android:textColor">@color/teal</item>
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="Widget.SampleDashboard.Item.Subject" parent="Widget">
+        <item name="android:textAppearance">?android:textAppearanceSmall</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/black_54</item>
     </style>
 
     <style name="Widget.SampleDashboard.Item.Description" parent="Widget">

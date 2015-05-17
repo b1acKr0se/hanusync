@@ -1,6 +1,8 @@
 package io.wyrmise.hanusync;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -11,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,9 +41,14 @@ public class MainFragment extends Fragment implements CourseAdapter.OnItemClickL
     private GridView gridView;
     private CourseAdapter courseAdapter;
     private SubmissionAdapter submissionAdapter;
+    private ArrayList<Submission> submissionList;
     private Map<String, String> cookies;
     private Map<String, String> urls;
 
+    private ImageView info;
+    private TextView no_submission;
+
+    private static final int SUBMISSION_SUBMITTED = 2;
 
     public MainFragment() {
         // Required empty public constructor
@@ -72,6 +80,22 @@ public class MainFragment extends Fragment implements CourseAdapter.OnItemClickL
                 view = inflater.inflate(R.layout.fragment_submission, container, false);
                 submissionProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
                 gridView = (GridView) view.findViewById(R.id.grid_view);
+                info = (ImageView) view.findViewById(R.id.info);
+                info.setOnClickListener(new View.OnClickListener(){
+                    public void onClick(View v){
+                        AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
+                        alertDialog.setTitle("Information");
+                        alertDialog.setMessage(getResources().getString(R.string.intro_message));
+                        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                        alertDialog.show();
+                    }
+                });
+                no_submission = (TextView) view.findViewById(R.id.no_submission);
                 new GetSubmission().execute();
                 break;
         }
@@ -133,16 +157,18 @@ public class MainFragment extends Fragment implements CourseAdapter.OnItemClickL
                 urls = new HashMap<>();
 
                 Elements eventName = document.select("div.content").select("div.event").select("a[href]");
-                for (int i = 0; i<eventName.size();i++) {
-                    if(i%2==0) {
+                for (int i = 0; i < eventName.size(); i++) {
+                    if (i % 2 == 0) {
                         Submission s = new Submission();
                         s.name = eventName.get(i).text();
+                        urls.put(s.name, eventName.get(i).attr("abs:href"));
+                        System.out.println(urls.get(s.name));
                         submissions.add(s);
                     }
                 }
 
-                Elements eventDate= document.select("div.content").select("div.event").select("div.date").select("a[href]");
-                for(int i = 0; i<eventDate.size();i++){
+                Elements eventDate = document.select("div.content").select("div.event").select("div.date").select("a[href]");
+                for (int i = 0; i < eventDate.size(); i++) {
                     Submission s = submissions.get(i);
                     s.date = eventDate.get(i).text();
                 }
@@ -156,19 +182,64 @@ public class MainFragment extends Fragment implements CourseAdapter.OnItemClickL
 
         @Override
         protected void onPostExecute(ArrayList<Submission> result) {
+            submissionList = result;
+            new GetSubmissionStatus().execute();
+        }
+    }
+
+    private class GetSubmissionStatus extends AsyncTask<Void, Void, Void> {
+
+        protected void onPreExecute() {
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                for (int i = 0; i<submissionList.size();i++) {
+                    Submission s = submissionList.get(i);
+                    Document document = Jsoup.connect(urls.get(s.name)).cookies(cookies).get();
+                    Elements elements = document.select("div#content").select("div.box.generalbox.generalboxcontent.boxaligncenter").select("div.files").select("a[href]");
+                    for (Element e : elements) {
+                        if (e.text().length() > 0) {
+                            s.status = SUBMISSION_SUBMITTED;
+                        }
+                    }
+                    String url = "";
+
+                    Element subject_url = document.select("div.navbar.clearfix").select("div.breadcrumb").select("ul").select("li").not("li.first").select("a[href]").first();
+                    url = subject_url.attr("abs:href");
+                    System.out.println(url);
+
+                    Document subject_document = Jsoup.connect(url).cookies(cookies).get();
+                    String title_raw = subject_document.title();
+                    String title = title_raw.substring(title_raw.lastIndexOf(": ") + 2, title_raw.length());
+
+                    s.subject = title;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
             submissionProgressBar.setVisibility(ProgressBar.GONE);
-            gridView.setVisibility(GridView.VISIBLE);
-            submissionAdapter = new SubmissionAdapter(result);
-            gridView.setAdapter(submissionAdapter);
+            if (submissionList.size() > 0 || submissionList != null) {
+                info.setVisibility(ImageView.VISIBLE);
+                gridView.setVisibility(GridView.VISIBLE);
+                submissionAdapter = new SubmissionAdapter(submissionList);
+                gridView.setAdapter(submissionAdapter);
+            } else {
+                no_submission.setVisibility(TextView.VISIBLE);
+            }
         }
     }
 
     public void onClick(View view, int position) {
-        switch(view.getId()){
+        switch (view.getId()) {
             case R.id.card_view:
                 selectCourse(position);
-                break;
-            case R.id.submission_view:
                 break;
         }
 

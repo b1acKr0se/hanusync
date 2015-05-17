@@ -8,15 +8,29 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+
         <LinearLayout
-            style="@style/Widget.SampleDashboard.Item"
+            style="@style/Widget.Submission.Item"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <ImageView
+                android:id="@+id/submissionStatus"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/submitted" />
+
             <TextView
                 android:id="@+id/submissionName"
                 style="@style/Widget.SampleDashboard.Item.Title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Hello world" />
+
+            <TextView
+                android:id="@+id/submissionSubject"
+                style="@style/Widget.SampleDashboard.Item.Subject"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Hello world" />

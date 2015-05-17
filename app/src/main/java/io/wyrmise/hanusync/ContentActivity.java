@@ -118,8 +118,9 @@ public class ContentActivity extends SwipeBackActivity {
                 try{
                     for(int i = 0; i<weekly_summary.size();i++){
                         Content content = contents.get(i);
-                        content.summary = br2nl(weekly_summary.get(i).html());
-                        System.out.println("Content summary"+content.summary+";");
+                        String summary = br2nl(weekly_summary.get(i).html());
+                        if(summary.equals("")) content.summary = "No summary";
+                        else content.summary = summary;
                     }
                 }catch(IndexOutOfBoundsException e){
 
@@ -147,7 +148,7 @@ public class ContentActivity extends SwipeBackActivity {
         Document document = Jsoup.parse(html);
         document.outputSettings(new Document.OutputSettings().prettyPrint(false));
         document.select("br").append("\\n");
-        document.select("p").prepend("\\n\\n");
+        document.select("p").prepend("\\n");
         String s = document.html().replaceAll("\\\\n", "\n");
         return Jsoup.clean(s, "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false));
     }

@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -14,6 +15,10 @@ import java.util.ArrayList;
 public class SubmissionAdapter extends BaseAdapter{
 
     private ArrayList<Submission> submissions;
+
+    private static final int SUBMISSION_PENDING = 1;
+
+    private static final int SUBMISSION_SUBMITTED = 2;
 
     public SubmissionAdapter(ArrayList<Submission> list){
         submissions = list;
@@ -44,8 +49,15 @@ public class SubmissionAdapter extends BaseAdapter{
 
         ((TextView) convertView.findViewById(R.id.submissionName)).setText(
                 submissions.get(position).name);
+        ((TextView) convertView.findViewById(R.id.submissionSubject)).setText(
+                submissions.get(position).subject);
         ((TextView) convertView.findViewById(R.id.submissionDate)).setText(
                 submissions.get(position).date);
+        if(submissions.get(position).status==SUBMISSION_SUBMITTED) {
+            ((ImageView) convertView.findViewById(R.id.submissionStatus)).setImageDrawable(convertView.getResources().getDrawable(R.drawable.submitted));
+        } else {
+            ((ImageView) convertView.findViewById(R.id.submissionStatus)).setImageDrawable(convertView.getResources().getDrawable(R.drawable.pending));
+        }
         return convertView;
     }
 }
