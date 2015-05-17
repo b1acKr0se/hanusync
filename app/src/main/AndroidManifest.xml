@@ -30,7 +30,7 @@
         </activity>
 
         <activity
-            android:name=".CourseActivity"
+            android:name=".ContentActivity"
             android:label="@string/title_activity_course"
             android:parentActivityName=".MainActivity" >
             <meta-data

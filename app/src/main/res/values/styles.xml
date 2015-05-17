@@ -17,6 +17,8 @@
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
+    <style name="Widget" />
+
     <style name="White" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <!-- colorPrimary is used for the default action bar background -->
@@ -30,6 +32,46 @@
         <item name="colorAccent">@color/white</item>
 
         <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+    <style name="Widget.SampleMessage">
+        <item name="android:textAppearance">?android:textAppearanceMedium</item>
+        <item name="android:lineSpacingMultiplier">1.1</item>
+        <item name="android:textColor">@color/black_54</item>
+    </style>
+
+    <style name="Widget.SampleDashboard.Card" parent="Widget">
+        <item name="android:gravity">center</item>
+        <item name="android:layout_margin">@dimen/card_margin</item>
+        <item name="cardCornerRadius">4dp</item>
+        <item name="cardElevation">5dp</item>
+        <item name="contentPadding">@dimen/card_padding</item>
+    </style>
+
+    <style name="Widget.SampleDashboard.Grid" parent="Widget">
+        <item name="android:stretchMode">columnWidth</item>
+        <item name="android:columnWidth">200dp</item>
+        <item name="android:numColumns">auto_fit</item>
+        <item name="android:drawSelectorOnTop">true</item>
+        <item name="android:horizontalSpacing">0dp</item>
+        <item name="android:verticalSpacing">0dp</item>
+    </style>
+
+    <style name="Widget.SampleDashboard.Item" parent="Widget">
+    </style>
+
+    <style name="Widget.SampleDashboard.Item.Title" parent="Widget">
+        <item name="android:layout_marginBottom">@dimen/margin_tiny</item>
+        <item name="android:textAppearance">?android:textAppearanceMedium</item>
+        <item name="android:textColor">@color/teal</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="Widget.SampleDashboard.Item.Description" parent="Widget">
+        <item name="android:textAppearance">?android:textAppearanceSmall</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/black_87</item>
     </style>
 
 

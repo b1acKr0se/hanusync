@@ -2,7 +2,6 @@ package io.wyrmise.hanusync;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -14,23 +13,19 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 public class MainActivity extends ActionBarActivity implements CourseAdapter.OnItemClickListener, NavAdapter.OnItemClickListener {
 
     private CharSequence title;
-    String TITLES[] = {"Courses","Settings"};
-    int ICONS[] = {R.drawable.ic_action_settings,R.drawable.ic_action_settings};
+    String TITLES[] = {"Courses","Submissions","Settings"};
+    int ICONS[] = {R.drawable.ic_action_settings,R.drawable.ic_action_settings,R.drawable.ic_action_settings};
     String NAME = "";
     String ID = "";
     private Toolbar toolbar;
@@ -133,7 +128,7 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
     }
 
     private void selectItem(int position) {
-        CourseFragment fragment = new CourseFragment();
+        MainFragment fragment = new MainFragment();
         Bundle args = new Bundle();
         args.putInt("option_number",position);
         fragment.setArguments(args);

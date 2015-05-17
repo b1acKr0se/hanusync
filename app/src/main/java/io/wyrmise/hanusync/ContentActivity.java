@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 
-public class CourseActivity extends SwipeBackActivity {
+public class ContentActivity extends SwipeBackActivity {
 
 
     private Toolbar toolbar;
