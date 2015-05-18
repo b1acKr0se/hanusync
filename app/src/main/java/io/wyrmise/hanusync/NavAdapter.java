@@ -99,15 +99,17 @@ public class NavAdapter extends RecyclerView.Adapter<NavAdapter.ViewHolder> {
             // position by 1 and pass it to the holder while setting the text and image
             holder.textView.setText(mNavTitles[position - 1]); // Setting the Text with the array of our Titles
             holder.imageView.setImageResource(mIcons[position - 1]);// Setting the image with array of our icons
-            holder.view.setOnClickListener(new View.OnClickListener(){
-                public void onClick(View view){
-                    mListener.onClick(view,position);
-                }
-            });
+
         } else {
             holder.Name.setText(name);
             holder.id.setText(id);
         }
+
+        holder.view.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View view){
+                mListener.onClick(view,position);
+            }
+        });
     }
 
     // This method returns the number of items present in the list

@@ -3,6 +3,7 @@ package io.wyrmise.hanusync;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -17,10 +18,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.Map;
@@ -28,8 +31,8 @@ import java.util.Map;
 public class MainActivity extends ActionBarActivity implements CourseAdapter.OnItemClickListener, NavAdapter.OnItemClickListener {
 
     private CharSequence title;
-    String TITLES[] = {"Courses","Submissions","Settings"};
-    int ICONS[] = {R.drawable.ic_action_settings,R.drawable.ic_action_settings,R.drawable.ic_action_settings};
+    String TITLES[] = {"General News", "Courses", "Submissions", "Settings", "Log out"};
+    int ICONS[] = {R.drawable.ic_action_copy,R.drawable.ic_action_copy,R.drawable.ic_action_paste, R.drawable.ic_action_settings, R.drawable.ic_action_undo};
     String NAME = "";
     String ID = "";
     private Toolbar toolbar;
@@ -44,6 +47,8 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         setContentView(R.layout.activity_main);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -78,31 +83,32 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
         Drawer.setDrawerListener(mDrawerToggle); // Drawer Listener set to the Drawer toggle
         mDrawerToggle.syncState();               // Finally we set the drawer toggle sync State
 
+        Intent intent = getIntent();
+        ID = intent.getStringExtra("id");
         new GetInformation().execute();
 
         if (savedInstanceState == null) {
-            selectItem(1);
+            getGeneralNews(1);
         }
 
     }
 
-    private class GetInformation extends AsyncTask<Void,Void,Void>{
+    private class GetInformation extends AsyncTask<Void, Void, Void> {
 
-        protected void onPreExecute(){
+        protected void onPreExecute() {
         }
 
         @Override
         protected Void doInBackground(Void... params) {
             try {
                 Intent intent = getIntent();
-                cookies = (Map<String,String>)intent.getSerializableExtra("cookies");
+                cookies = (Map<String, String>) intent.getSerializableExtra("cookies");
                 Document document = Jsoup.connect("http://fit.hanu.edu.vn/fitportal/").cookies(cookies).get();
                 Element featureName = document.select("div.header-profilename").first();
                 featureName.select("a[href]");
                 String url = featureName.text();
                 int t = getIndexOfFirstNumber(url);
-                NAME = url.substring(0,t);
-                ID = intent.getStringExtra("id");
+                NAME = url.substring(0, t);
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -112,7 +118,7 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
 
         @Override
         protected void onPostExecute(Void result) {
-            mAdapter = new NavAdapter(TITLES,ICONS,NAME,ID,MainActivity.this);
+            mAdapter = new NavAdapter(TITLES, ICONS, NAME, ID, MainActivity.this);
             mRecyclerView.setAdapter(mAdapter);
         }
     }
@@ -127,25 +133,74 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
     }
 
     public void onClick(View view, int position) {
-        selectItem(position);
+        switch(position){
+            case 1:
+                getGeneralNews(position);
+                break;
+            case 2:
+                selectItem(position);
+                break;
+            case 3:
+                selectItem(position);
+                break;
+            case 4:
 
+                break;
+            case 5:
+                showLogOutDialog();
+                break;
+        }
     }
 
-    private void selectItem(int position) {
-        MainFragment fragment = new MainFragment();
+    private void getGeneralNews(int position) {
+        NewsFragment fragment = new NewsFragment();
         Bundle args = new Bundle();
-        args.putInt("option_number",position);
+        args.putInt("news_type", position);
         fragment.setArguments(args);
         fragment.newInstance(position);
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.content_frame,fragment);
+        fragmentTransaction.replace(R.id.content_frame, fragment);
         fragmentTransaction.commit();
-        setTitle(TITLES[position-1]);
+        setTitle(TITLES[position - 1]);
         Drawer.closeDrawer(mRecyclerView);
     }
 
-    public void setTitle(CharSequence title){
+    private void showLogOutDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Confirm");
+        builder.setMessage("Are you sure you want to log out?");
+        builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                new LogOutAsyncTask().execute();
+                dialog.dismiss();
+            }
+        });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+
+    private void selectItem(int position) {
+        MainFragment fragment = new MainFragment();
+        Bundle args = new Bundle();
+        args.putInt("option_number", position);
+        fragment.setArguments(args);
+        fragment.newInstance(position);
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.content_frame, fragment);
+        fragmentTransaction.commit();
+        setTitle(TITLES[position - 1]);
+        Drawer.closeDrawer(mRecyclerView);
+    }
+
+    public void setTitle(CharSequence title) {
         this.title = title;
         getSupportActionBar().setTitle(this.title);
     }
@@ -154,6 +209,45 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return super.onOptionsItemSelected(item);
+    }
+
+    private class LogOutAsyncTask extends AsyncTask<Void, Void, Boolean> {
+        ProgressDialog progressDialog;
+
+        protected void onPreExecute() {
+            progressDialog = new ProgressDialog(MainActivity.this);
+            progressDialog.setMessage("Loging out, please wait...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try {
+                Document document = Jsoup.connect("http://fit.hanu.edu.vn/fitportal/").cookies(cookies).get();
+                Elements featureName = document.select("div.header-profileoptions").select("ul").select("li").select("a[href]");
+                String url = featureName.get(2).attr("abs:href");
+                System.out.println("Get url: "+url);
+                Jsoup.connect(url).cookies(cookies).get();
+                return true;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (result) {
+                Intent i = getBaseContext().getPackageManager()
+                        .getLaunchIntentForPackage(getBaseContext().getPackageName());
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                finish();
+                startActivity(i);
+            } else {
+                Toast.makeText(getApplicationContext(),"There's an error while trying to logging out!",Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
 

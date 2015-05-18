@@ -6,7 +6,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
 
         <include
             android:id="@+id/toolbar"
@@ -16,6 +17,7 @@
             android:id="@+id/content_frame"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/gray_default"
             android:layout_below="@id/toolbar" />
     </RelativeLayout>
 
@@ -25,5 +27,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="left"
         android:background="#ffffff"
-        android:scrollbars="vertical"></android.support.v7.widget.RecyclerView>
+        android:scrollbars="vertical">
+
+    </android.support.v7.widget.RecyclerView>
 </android.support.v4.widget.DrawerLayout>

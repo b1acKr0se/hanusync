@@ -22,25 +22,23 @@ import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
 
 
-public class ContentActivity extends SwipeBackActivity {
-
+public class ThreadActivity extends SwipeBackActivity {
 
     private Toolbar toolbar;
     private RecyclerView recyclerView;
-    private ContentAdapter adapter;
+    private ThreadAdapter adapter;
     private ProgressBar progressBar;
     private Map<String, String> cookies;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
-        setContentView(R.layout.activity_course);
+        setContentView(R.layout.activity_thread);
 
         setDragEdge(SwipeBackLayout.DragEdge.LEFT);
 
@@ -49,13 +47,11 @@ public class ContentActivity extends SwipeBackActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Intent intent = getIntent();
-        String name = intent.getStringExtra("subject");
-        setTitle(name);
+        setTitle("View Topic");
 
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
-        recyclerView = (RecyclerView) findViewById(R.id.courseList);
+        recyclerView = (RecyclerView) findViewById(R.id.commentList);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
@@ -73,7 +69,7 @@ public class ContentActivity extends SwipeBackActivity {
             }
         });
 
-        new GetContent().execute();
+        new ExtractTopic().execute();
     }
 
     private void hideViews() {
@@ -84,48 +80,50 @@ public class ContentActivity extends SwipeBackActivity {
         toolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
     }
 
-    private class GetContent extends AsyncTask<Void, Void, ArrayList<Content>> {
+    private class ExtractTopic extends AsyncTask<Void, Void, ArrayList<Comment>> {
 
         protected void onPreExecute() {
             progressBar.setVisibility(ProgressBar.VISIBLE);
         }
 
         @Override
-        protected ArrayList<Content> doInBackground(Void... params) {
+        protected ArrayList<Comment> doInBackground(Void... params) {
             try {
                 Intent intent = getIntent();
                 cookies = (Map<String, String>) intent.getSerializableExtra("cookies");
 
-                String url = intent.getStringExtra("url");
+                String url = intent.getStringExtra("topic");
 
-                ArrayList<Content> contents = new ArrayList<>();
+                ArrayList<Comment> comments = new ArrayList<>();
 
                 Document document = Jsoup.connect(url).cookies(cookies).get();
 
-                Elements weekly_content = document.select("table.weeks").select("h3.weekdates");
+                Element table = document.select("table.forumpost").first();
 
-                Content first = new Content();
-                contents.add(first);
-
-                for(Element e:weekly_content){
-                    Content content = new Content();
-                    content.date = br2nl(e.html());
-                    contents.add(content);
+                for (Element row : table.select("tr.header")) {
+                    Comment c = new Comment();
+                    c.subject = row.select("div.subject").text();
+                    c.author = row.select("div.author").text();
+                    comments.add(c);
                 }
 
-                Elements weekly_summary = document.select("table.weeks").select("div.summary");
+                Elements table_content = document.select("table.forumpost").select("tr").select("td.content");
+                Elements attachments = document.select("table.forumpost").select("tr").select("td.content").select("div.attachments").select("a[href]");
 
-                try{
-                    for(int i = 0; i<weekly_summary.size();i++){
-                        Content content = contents.get(i);
-                        String summary = br2nl(weekly_summary.get(i).html());
-                        if(summary.equals("")) content.summary = "No summary";
-                        else content.summary = summary;
+
+                for (int i = 0; i < comments.size(); i++) {
+                    Comment c = comments.get(i);
+                    c.content = table_content.get(i).select("div.posting").text();
+                    if (attachments.attr("abs:href").length() > 0) {
+                        c.hasAttachment = true;
+                        String link = attachments.attr("abs:href");
+                        String text = attachments.text();
+                        c.attachment = "<a href=\"" + link + "\">" + text + "</a>";
+                    } else {
+                        c.hasAttachment = false;
                     }
-                }catch(IndexOutOfBoundsException e){
-
                 }
-                return contents;
+                return comments;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -133,19 +131,25 @@ public class ContentActivity extends SwipeBackActivity {
         }
 
         @Override
-        protected void onPostExecute(ArrayList<Content> result) {
+        protected void onPostExecute(ArrayList<Comment> result) {
             progressBar.setVisibility(ProgressBar.GONE);
             recyclerView.setVisibility(RecyclerView.VISIBLE);
-
-            adapter = new ContentAdapter(result);
-            recyclerView.setAdapter(adapter);
+            if (result != null) {
+                adapter = new ThreadAdapter(result);
+                recyclerView.setAdapter(adapter);
+            }
         }
     }
 
     public static String br2nl(String html) {
         if (html == null)
             return html;
-        Document document = Jsoup.parse(html);
+        Document document = null;
+        try {
+            document = Jsoup.parse(new URL(html).openStream(), "UTF-8", html);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         document.outputSettings(new Document.OutputSettings().prettyPrint(false));
         document.select("br").append("\\n");
         document.select("p").prepend("\\n");

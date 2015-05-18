@@ -13,6 +13,7 @@
              which is used to tint widgets -->
         <item name="colorAccent">@color/dark_sepia</item>
 
+        <item name="android:windowBackground">@color/sepia</item>
 
         <item name="android:windowTranslucentStatus">true</item>
     </style>

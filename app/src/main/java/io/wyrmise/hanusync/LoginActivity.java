@@ -4,38 +4,27 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.LoaderManager.LoaderCallbacks;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.CursorLoader;
-import android.content.Loader;
-import android.database.Cursor;
-import android.net.Uri;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.content.Intent;
+import android.widget.Toast;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.Connection;
-import org.w3c.dom.Text;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -59,6 +48,9 @@ public class LoginActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
+
         setContentView(R.layout.activity_login);
         setTheme(R.style.White);
         // Set up the login form.
@@ -69,7 +61,7 @@ public class LoginActivity extends Activity {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
+                    new InternetCheckingAsyncTask().execute();
                     return true;
                 }
                 return false;
@@ -80,7 +72,7 @@ public class LoginActivity extends Activity {
         retry = (Button) findViewById(R.id.reconnectBtn);
         retry.setOnClickListener(new OnClickListener() {
             public void onClick(View view) {
-                checkForInternet();
+                new ReconnectAsyncTask().execute();
             }
         });
 
@@ -88,10 +80,7 @@ public class LoginActivity extends Activity {
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isOnline())
-                    attemptLogin();
-                else checkForInternet();
-
+                new InternetCheckingAsyncTask().execute();
             }
         });
 
@@ -100,8 +89,8 @@ public class LoginActivity extends Activity {
 
     }
 
-    public void checkForInternet() {
-        if (isOnline()) {
+    public void checkForInternet(boolean check) {
+        if (check) {
             mLoginFormView.setVisibility(View.VISIBLE);
             no_internet.setVisibility(TextView.GONE);
             retry.setVisibility(Button.GONE);
@@ -237,6 +226,11 @@ public class LoginActivity extends Activity {
         private final String mPassword;
         private Map<String, String> cookies = new HashMap<String, String>();
 
+        protected void onPreExecute() {
+            mProgressView.setVisibility(View.VISIBLE);
+            mLoginFormView.setVisibility(View.GONE);
+        }
+
         UserLoginTask(String email, String password) {
             mId = email;
             mPassword = password;
@@ -263,12 +257,10 @@ public class LoginActivity extends Activity {
                     return false;
                 return true;
 
-
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
                 return false;
             }
-
         }
 
         @Override
@@ -297,6 +289,64 @@ public class LoginActivity extends Activity {
 
     }
 
+    private class InternetCheckingAsyncTask extends AsyncTask<Void, Void, Boolean> {
+
+        protected void onPreExecute() {
+            mProgressView.setVisibility(View.VISIBLE);
+            mLoginFormView.setVisibility(View.GONE);
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            if (isOnline())
+                return true;
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            if (success) {
+                attemptLogin();
+            } else {
+                mProgressView.setVisibility(View.GONE);
+                mLoginFormView.setVisibility(View.GONE);
+                checkForInternet(false);
+            }
+        }
+
+    }
+
+    private class ReconnectAsyncTask extends AsyncTask<Void, Void, Boolean> {
+
+        protected void onPreExecute() {
+            mProgressView.setVisibility(View.VISIBLE);
+            mLoginFormView.setVisibility(View.GONE);
+            no_internet.setVisibility(TextView.GONE);
+            retry.setVisibility(Button.GONE);
+            Toast.makeText(getApplicationContext(),"Reconnecting, please wait",Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            if (isOnline())
+                return true;
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            if (success) {
+                checkForInternet(true);
+                mProgressView.setVisibility(View.GONE);
+                mLoginFormView.setVisibility(View.VISIBLE);
+            } else {
+                mProgressView.setVisibility(View.GONE);
+                mLoginFormView.setVisibility(View.GONE);
+                checkForInternet(false);
+            }
+        }
+
+    }
 }
 
 

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -16,7 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,6 +47,8 @@ public class MainFragment extends Fragment implements CourseAdapter.OnItemClickL
     private ArrayList<Submission> submissionList;
     private Map<String, String> cookies;
     private Map<String, String> urls;
+    private SwipeRefreshLayout courseSwipeLayout;
+    private SwipeRefreshLayout submissionSwipeLayout;
 
     private TextView no_submission;
 
@@ -68,33 +70,62 @@ public class MainFragment extends Fragment implements CourseAdapter.OnItemClickL
         View view = null;
         int i = getArguments().getInt(ARG_OPTION_NUMBER);
         switch (i) {
-            case 1:
+            case 2:
                 view = inflater.inflate(R.layout.fragment_course, container, false);
-                progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
                 setHasOptionsMenu(false);
+                progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+                courseSwipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.course_swipe_refresh);
+
+                courseSwipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        refreshCourse();
+                    }
+                });
+
                 recyclerView = (RecyclerView) view.findViewById(R.id.courseList);
                 recyclerView.setHasFixedSize(true);
                 LinearLayoutManager llm = new LinearLayoutManager(getActivity().getApplicationContext());
                 llm.setOrientation(LinearLayoutManager.VERTICAL);
                 recyclerView.setLayoutManager(llm);
-                new GetNameAndID().execute();
+                progressBar.setVisibility(ProgressBar.VISIBLE);
+                new GetCourse().execute();
                 break;
-            case 2:
+            case 3:
                 view = inflater.inflate(R.layout.fragment_submission, container, false);
                 submissionProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
                 gridView = (GridView) view.findViewById(R.id.grid_view);
                 no_submission = (TextView) view.findViewById(R.id.no_submission);
+
+                submissionSwipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.submission_swipe_refresh);
+                submissionSwipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        refreshSubmission();
+                    }
+                });
                 setHasOptionsMenu(true);
+                submissionProgressBar.setVisibility(ProgressBar.VISIBLE);
                 new GetSubmission().execute();
                 break;
         }
         return view;
     }
 
-    private class GetNameAndID extends AsyncTask<Void, Void, ArrayList<Course>> {
+    private void refreshSubmission() {
+        Toast.makeText(getActivity().getApplicationContext(),"Refreshing submission list",Toast.LENGTH_SHORT).show();
+        new GetSubmission().execute();
+    }
+
+    private void refreshCourse() {
+        Toast.makeText(getActivity().getApplicationContext(),"Refreshing course list",Toast.LENGTH_SHORT).show();
+        new GetCourse().execute();
+    }
+
+    private class GetCourse extends AsyncTask<Void, Void, ArrayList<Course>> {
 
         protected void onPreExecute() {
-            progressBar.setVisibility(ProgressBar.VISIBLE);
+
         }
 
         @Override
@@ -111,15 +142,15 @@ public class MainFragment extends Fragment implements CourseAdapter.OnItemClickL
 
                 for (Element e : courseName) {
                     Course c = new Course();
-                    c.year = e.text().substring(0,3);
-                    c.name = e.text().substring(e.text().lastIndexOf(": ") + 2,e.text().length());
+                    c.year = e.text().substring(0, 3);
+                    c.name = e.text().substring(e.text().lastIndexOf(": ") + 2, e.text().length());
                     courses.add(c);
                     urls.put(c.name, e.attr("abs:href"));
                 }
 
-                for(int i =0; i<courses.size();i++){
+                for (int i = 0; i < courses.size(); i++) {
                     Course c = courses.get(i);
-                    if(c.name.equals("tudent's Forums"))
+                    if (c.name.equals("tudent's Forums"))
                         courses.remove(i);
                 }
 
@@ -135,15 +166,18 @@ public class MainFragment extends Fragment implements CourseAdapter.OnItemClickL
         protected void onPostExecute(ArrayList<Course> result) {
             progressBar.setVisibility(ProgressBar.GONE);
             recyclerView.setVisibility(RecyclerView.VISIBLE);
-            courseAdapter = new CourseAdapter(result, MainFragment.this);
-            recyclerView.setAdapter(courseAdapter);
+            courseSwipeLayout.setRefreshing(false);
+            if(result.size()>0 && result!=null) {
+                courseAdapter = new CourseAdapter(result, MainFragment.this);
+                recyclerView.setAdapter(courseAdapter);
+            }
         }
     }
 
     private class GetSubmission extends AsyncTask<Void, Void, ArrayList<Submission>> {
 
         protected void onPreExecute() {
-            submissionProgressBar.setVisibility(ProgressBar.VISIBLE);
+
         }
 
         @Override
@@ -195,7 +229,7 @@ public class MainFragment extends Fragment implements CourseAdapter.OnItemClickL
         @Override
         protected Void doInBackground(Void... params) {
             try {
-                for (int i = 0; i<submissionList.size();i++) {
+                for (int i = 0; i < submissionList.size(); i++) {
                     Submission s = submissionList.get(i);
                     Document document = Jsoup.connect(urls.get(s.name)).cookies(cookies).get();
                     Elements elements = document.select("div#content").select("div.box.generalbox.generalboxcontent.boxaligncenter").select("div.files").select("a[href]");
@@ -225,6 +259,7 @@ public class MainFragment extends Fragment implements CourseAdapter.OnItemClickL
         @Override
         protected void onPostExecute(Void result) {
             submissionProgressBar.setVisibility(ProgressBar.GONE);
+            submissionSwipeLayout.setRefreshing(false);
             if (submissionList.size() > 0 || submissionList != null) {
                 gridView.setVisibility(GridView.VISIBLE);
                 submissionAdapter = new SubmissionAdapter(submissionList);
@@ -262,7 +297,7 @@ public class MainFragment extends Fragment implements CourseAdapter.OnItemClickL
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // Inflate the menu items for use in the action bar
         inflater.inflate(R.menu.menu_main, menu);
-        super.onCreateOptionsMenu(menu,inflater);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
