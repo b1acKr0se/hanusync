@@ -10,6 +10,9 @@ import android.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
@@ -45,7 +48,6 @@ public class MainFragment extends Fragment implements CourseAdapter.OnItemClickL
     private Map<String, String> cookies;
     private Map<String, String> urls;
 
-    private ImageView info;
     private TextView no_submission;
 
     private static final int SUBMISSION_SUBMITTED = 2;
@@ -69,6 +71,7 @@ public class MainFragment extends Fragment implements CourseAdapter.OnItemClickL
             case 1:
                 view = inflater.inflate(R.layout.fragment_course, container, false);
                 progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+                setHasOptionsMenu(false);
                 recyclerView = (RecyclerView) view.findViewById(R.id.courseList);
                 recyclerView.setHasFixedSize(true);
                 LinearLayoutManager llm = new LinearLayoutManager(getActivity().getApplicationContext());
@@ -80,49 +83,46 @@ public class MainFragment extends Fragment implements CourseAdapter.OnItemClickL
                 view = inflater.inflate(R.layout.fragment_submission, container, false);
                 submissionProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
                 gridView = (GridView) view.findViewById(R.id.grid_view);
-                info = (ImageView) view.findViewById(R.id.info);
-                info.setOnClickListener(new View.OnClickListener(){
-                    public void onClick(View v){
-                        AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
-                        alertDialog.setTitle("Information");
-                        alertDialog.setMessage(getResources().getString(R.string.intro_message));
-                        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                });
-                        alertDialog.show();
-                    }
-                });
                 no_submission = (TextView) view.findViewById(R.id.no_submission);
+                setHasOptionsMenu(true);
                 new GetSubmission().execute();
                 break;
         }
         return view;
     }
 
-    private class GetNameAndID extends AsyncTask<Void, Void, ArrayList<String>> {
+    private class GetNameAndID extends AsyncTask<Void, Void, ArrayList<Course>> {
 
         protected void onPreExecute() {
             progressBar.setVisibility(ProgressBar.VISIBLE);
         }
 
         @Override
-        protected ArrayList<String> doInBackground(Void... params) {
+        protected ArrayList<Course> doInBackground(Void... params) {
             try {
                 Intent intent = getActivity().getIntent();
                 cookies = (Map<String, String>) intent.getSerializableExtra("cookies");
                 Document document = Jsoup.connect("http://fit.hanu.edu.vn/fitportal/").cookies(cookies).get();
 
-                ArrayList<String> courses = new ArrayList<>();
+                ArrayList<Course> courses = new ArrayList<>();
                 urls = new HashMap<>();
 
                 Elements courseName = document.select("div.content").select("ul.list").select("li.r0,li.r1").select("a[href]");
+
                 for (Element e : courseName) {
-                    courses.add(e.text());
-                    urls.put(e.text(), e.attr("abs:href"));
+                    Course c = new Course();
+                    c.year = e.text().substring(0,3);
+                    c.name = e.text().substring(e.text().lastIndexOf(": ") + 2,e.text().length());
+                    courses.add(c);
+                    urls.put(c.name, e.attr("abs:href"));
                 }
+
+                for(int i =0; i<courses.size();i++){
+                    Course c = courses.get(i);
+                    if(c.name.equals("tudent's Forums"))
+                        courses.remove(i);
+                }
+
                 return courses;
 
             } catch (IOException e) {
@@ -132,7 +132,7 @@ public class MainFragment extends Fragment implements CourseAdapter.OnItemClickL
         }
 
         @Override
-        protected void onPostExecute(ArrayList<String> result) {
+        protected void onPostExecute(ArrayList<Course> result) {
             progressBar.setVisibility(ProgressBar.GONE);
             recyclerView.setVisibility(RecyclerView.VISIBLE);
             courseAdapter = new CourseAdapter(result, MainFragment.this);
@@ -226,7 +226,6 @@ public class MainFragment extends Fragment implements CourseAdapter.OnItemClickL
         protected void onPostExecute(Void result) {
             submissionProgressBar.setVisibility(ProgressBar.GONE);
             if (submissionList.size() > 0 || submissionList != null) {
-                info.setVisibility(ImageView.VISIBLE);
                 gridView.setVisibility(GridView.VISIBLE);
                 submissionAdapter = new SubmissionAdapter(submissionList);
                 gridView.setAdapter(submissionAdapter);
@@ -246,10 +245,11 @@ public class MainFragment extends Fragment implements CourseAdapter.OnItemClickL
     }
 
     private void selectCourse(int position) {
-        String name = courseAdapter.get(position);
+        Course c = courseAdapter.get(position);
+        String name = c.name;
         if (urls.containsKey(name)) {
             Intent intent = new Intent(getActivity().getApplicationContext(), ContentActivity.class);
-            String subject = name.substring(name.lastIndexOf(": ") + 2, name.length());
+            String subject = name;
             intent.putExtra("subject", subject);
             intent.putExtra("url", urls.get(name));
             intent.putExtra("cookies", (java.io.Serializable) cookies);
@@ -257,6 +257,34 @@ public class MainFragment extends Fragment implements CourseAdapter.OnItemClickL
         } else {
             Toast.makeText(getActivity().getApplicationContext(), "There's an error", Toast.LENGTH_LONG);
         }
+    }
+
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // Inflate the menu items for use in the action bar
+        inflater.inflate(R.menu.menu_main, menu);
+        super.onCreateOptionsMenu(menu,inflater);
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_info:
+                showInfo();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void showInfo() {
+        AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
+        alertDialog.setTitle("Information");
+        alertDialog.setMessage(getResources().getString(R.string.intro_message));
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
     }
 
 }

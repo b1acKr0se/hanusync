@@ -10,9 +10,11 @@
     <string name="login">Login</string>
     <string name="title_activity_test">TestActivity</string>
     <string name="title_activity_course">CourseActivity</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="info">Information</string>
     <string name="intro_message">Here you can quickly view the status of your submissions. Please note that the app will assume that you
     have completed a submission if it finds a submitted file.</string>
     <string name="no_submission">No pending submission</string>
+    <string name="no_internet">No internet connection</string>
+    <string name="retry">Retry</string>
 
 </resources>

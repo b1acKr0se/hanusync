@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
@@ -34,12 +35,13 @@ import java.util.Map;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.Connection;
+import org.w3c.dom.Text;
 
 
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
+public class LoginActivity extends Activity {
 
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -51,6 +53,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    private TextView no_internet;
+    private Button retry;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,16 +76,56 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             }
         });
 
+        no_internet = (TextView) findViewById(R.id.no_internet);
+        retry = (Button) findViewById(R.id.reconnectBtn);
+        retry.setOnClickListener(new OnClickListener() {
+            public void onClick(View view) {
+                checkForInternet();
+            }
+        });
+
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptLogin();
+                if (isOnline())
+                    attemptLogin();
+                else checkForInternet();
+
             }
         });
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+    }
+
+    public void checkForInternet() {
+        if (isOnline()) {
+            mLoginFormView.setVisibility(View.VISIBLE);
+            no_internet.setVisibility(TextView.GONE);
+            retry.setVisibility(Button.GONE);
+        } else {
+            mLoginFormView.setVisibility(View.GONE);
+            no_internet.setVisibility(TextView.VISIBLE);
+            retry.setVisibility(Button.VISIBLE);
+        }
+    }
+
+    public boolean isOnline() {
+        Runtime runtime = Runtime.getRuntime();
+        try {
+            Process ipProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
+            int exitValue = ipProcess.waitFor();
+            return (exitValue == 0);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
 
@@ -182,47 +226,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         }
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(this,
-                // Retrieve data rows for the device user's 'profile' contact.
-                Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI,
-                        ContactsContract.Contacts.Data.CONTENT_DIRECTORY), ProfileQuery.PROJECTION,
-
-                // Select only email addresses.
-                ContactsContract.Contacts.Data.MIMETYPE +
-                        " = ?", new String[]{ContactsContract.CommonDataKinds.Email
-                .CONTENT_ITEM_TYPE},
-
-                // Show primary email addresses first. Note that there won't be
-                // a primary email address if the user hasn't specified one.
-                ContactsContract.Contacts.Data.IS_PRIMARY + " DESC");
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        List<String> emails = new ArrayList<String>();
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            emails.add(cursor.getString(ProfileQuery.ADDRESS));
-            cursor.moveToNext();
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader) {
-
-    }
-
-    private interface ProfileQuery {
-        String[] PROJECTION = {
-                ContactsContract.CommonDataKinds.Email.ADDRESS,
-                ContactsContract.CommonDataKinds.Email.IS_PRIMARY,
-        };
-
-        int ADDRESS = 0;
-        int IS_PRIMARY = 1;
-    }
 
     /**
      * Represents an asynchronous login/registration task used to authenticate
@@ -232,7 +235,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
         private final String mId;
         private final String mPassword;
-        private Map<String,String> cookies = new HashMap<String,String>();
+        private Map<String, String> cookies = new HashMap<String, String>();
 
         UserLoginTask(String email, String password) {
             mId = email;
@@ -245,7 +248,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                 Connection.Response loginForm = Jsoup.connect("http://fit.hanu.edu.vn/fitportal/login/index.php")
                         .data("username", mId)
                         .data("password", mPassword)
-                        .timeout(10000)
                         .method(Connection.Method.POST)
                         .execute();
 
@@ -257,7 +259,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
                 Thread.sleep(2000);
 
-                if(document.title().contains("Faculty of IT - HANU :: Portal: Login to the site"))
+                if (document.title().contains("Faculty of IT - HANU :: Portal: Login to the site"))
                     return false;
                 return true;
 
@@ -276,8 +278,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
             if (success) {
                 finish();
-                Intent myIntent = new Intent(LoginActivity.this,MainActivity.class);
-                myIntent.putExtra("id",mId);
+                Intent myIntent = new Intent(LoginActivity.this, MainActivity.class);
+                myIntent.putExtra("id", mId);
                 myIntent.putExtra("cookies", (java.io.Serializable) cookies);
                 LoginActivity.this.startActivity(myIntent);
 
@@ -292,7 +294,9 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             mAuthTask = null;
             showProgress(false);
         }
+
     }
+
 }
 
 

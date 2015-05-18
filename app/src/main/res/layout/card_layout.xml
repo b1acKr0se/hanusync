@@ -15,14 +15,36 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/submissionName"
+            android:id="@+id/courseDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Widget.SampleDashboard.Item.Title"
+            android:text="@string/hello_world"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="15dp"
+            />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="1dp"
+            android:layout_height="fill_parent"
+            android:layout_toRightOf="@id/courseDate"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:textSize="@dimen/abc_text_size_body_1_material"
+            android:background="#59676266" />
+
+        <TextView
+            android:id="@+id/courseName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Name"
             android:layout_centerVertical="true"
             android:textSize="@dimen/abc_text_size_body_1_material"
+            android:layout_toRightOf="@id/divider"
             android:layout_marginTop="10dp"
-            android:layout_marginStart="15dp"/>
+            android:layout_marginStart="10dp"/>
 
     </RelativeLayout>
     </android.support.v7.widget.CardView>

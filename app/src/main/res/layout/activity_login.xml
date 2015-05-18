@@ -8,7 +8,6 @@
 
     <!-- Login progress -->
 
-
     <ScrollView
         android:id="@+id/login_form"
         android:layout_width="match_parent"
@@ -72,6 +71,28 @@
 
         </LinearLayout>
     </ScrollView>
+
+    <TextView
+        android:id="@+id/no_internet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="@string/no_internet"
+        style="@style/Widget.SampleDashboard.Item.Description"
+        android:textColor="@color/white"
+        android:textSize="24dp"
+        android:visibility="gone"/>
+
+    <Button
+        android:id="@+id/reconnectBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/no_internet"
+        android:layout_centerHorizontal="true"
+        android:text="@string/retry"
+        android:layout_marginTop="5dp"
+        android:visibility="gone"/>
+
 
     <ProgressBar
         android:id="@+id/login_progress"

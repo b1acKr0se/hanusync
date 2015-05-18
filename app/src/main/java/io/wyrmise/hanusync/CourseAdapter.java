@@ -13,10 +13,10 @@ import java.util.ArrayList;
  */
 public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseViewHolder> {
 
-    private ArrayList<String> courseList;
+    private ArrayList<Course> courseList;
     OnItemClickListener mListener;
 
-    public CourseAdapter(ArrayList<String> list, OnItemClickListener listener) {
+    public CourseAdapter(ArrayList<Course> list, OnItemClickListener listener) {
         courseList = list;
         mListener = listener;
     }
@@ -33,7 +33,7 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseView
         return courseList.size();
     }
 
-    public String get(int position) {
+    public Course get(int position) {
         return courseList.get(position);
     }
 
@@ -48,7 +48,8 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseView
 
     @Override
     public void onBindViewHolder(CourseViewHolder courseViewHolder, final int i) {
-        courseViewHolder.courseName.setText(courseList.get(i));
+        courseViewHolder.courseDate.setText(courseList.get(i).year);
+        courseViewHolder.courseName.setText(courseList.get(i).name);
         courseViewHolder.view.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 mListener.onClick(view, i);
@@ -58,12 +59,14 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseView
 
     public static class CourseViewHolder extends RecyclerView.ViewHolder {
         protected TextView courseName;
+        protected TextView courseDate;
         protected View view;
 
         public CourseViewHolder(View v) {
             super(v);
             view = v;
-            courseName = (TextView) v.findViewById(R.id.submissionName);
+            courseName = (TextView) v.findViewById(R.id.courseName);
+            courseDate = (TextView) v.findViewById(R.id.courseDate);
         }
     }
 }
