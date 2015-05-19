@@ -63,7 +63,7 @@
             android:layout_below="@id/body"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="5dp"
             android:background="@drawable/divider"
             android:visibility="gone"/>
 

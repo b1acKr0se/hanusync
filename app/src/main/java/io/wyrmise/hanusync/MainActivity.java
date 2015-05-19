@@ -31,8 +31,8 @@ import java.util.Map;
 public class MainActivity extends ActionBarActivity implements CourseAdapter.OnItemClickListener, NavAdapter.OnItemClickListener {
 
     private CharSequence title;
-    String TITLES[] = {"General News", "Courses", "Submissions", "Settings", "Log out"};
-    int ICONS[] = {R.drawable.ic_action_copy,R.drawable.ic_action_copy,R.drawable.ic_action_paste, R.drawable.ic_action_settings, R.drawable.ic_action_undo};
+    String TITLES[] = {"General News","Marktable Collection", "Courses", "Submissions", "Settings", "Log out"};
+    int ICONS[] = {R.drawable.ic_action_copy,R.drawable.ic_action_copy,R.drawable.ic_action_copy,R.drawable.ic_action_paste, R.drawable.ic_action_settings, R.drawable.ic_action_undo};
     String NAME = "";
     String ID = "";
     private Toolbar toolbar;
@@ -138,15 +138,18 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
                 getGeneralNews(position);
                 break;
             case 2:
-                selectItem(position);
+                getGeneralNews(position);
                 break;
             case 3:
                 selectItem(position);
                 break;
             case 4:
-
+                selectItem(position);
                 break;
             case 5:
+
+                break;
+            case 6:
                 showLogOutDialog();
                 break;
         }

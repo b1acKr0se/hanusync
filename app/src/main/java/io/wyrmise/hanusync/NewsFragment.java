@@ -32,6 +32,7 @@ import java.util.Map;
 public class NewsFragment extends Fragment implements NewsAdapter.OnItemClickListener {
 
     private static final String ARG_NEWS_TYPE = "news_type";
+    private int news_type = 1;
 
     private ProgressBar progressBar;
     private SwipeRefreshLayout newsSwipeLayout;
@@ -55,6 +56,14 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnItemClickLis
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         int i = getArguments().getInt(ARG_NEWS_TYPE);
+        switch (i){
+            case 1:
+                news_type = 1;
+                break;
+            case 2:
+                news_type = 2;
+                break;
+        }
 
         View view = inflater.inflate(R.layout.news_fragment, container, false);
         setHasOptionsMenu(false);
@@ -111,7 +120,16 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnItemClickLis
             try {
                 Intent intent = getActivity().getIntent();
                 cookies = (Map<String, String>) intent.getSerializableExtra("cookies");
-                Document document = Jsoup.connect("http://fit.hanu.edu.vn/fitportal/mod/forum/view.php?id=28").cookies(cookies).get();
+                Document document = null;
+
+                switch (news_type) {
+                    case 1:
+                        document = Jsoup.connect("http://fit.hanu.edu.vn/fitportal/mod/forum/view.php?id=28").cookies(cookies).get();
+                        break;
+                    case 2:
+                        document = Jsoup.connect("http://fit.hanu.edu.vn/fitportal/mod/forum/view.php?id=25").cookies(cookies).get();
+                        break;
+                }
 
                 ArrayList<News> news = new ArrayList<>();
                 urls = new HashMap<>();

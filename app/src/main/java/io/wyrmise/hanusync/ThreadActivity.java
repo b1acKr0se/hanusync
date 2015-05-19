@@ -18,11 +18,15 @@ import com.liuguangqiang.swipeback.SwipeBackLayout;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Entities;
 import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -98,30 +102,27 @@ public class ThreadActivity extends SwipeBackActivity {
 
                 Document document = Jsoup.connect(url).cookies(cookies).get();
 
-                Element table = document.select("table.forumpost").first();
-
-                for (Element row : table.select("tr.header")) {
+                Elements table = document.select("table.forumpost").select("tr.header");
+                System.out.println(table.size());
+                Elements table_content = document.select("table.forumpost").select("tr").not("tr.header");
+                System.out.println(table_content.size());
+                Elements attachments = document.select("table.forumpost").select("tr").not("tr.header");
+                System.out.println(attachments.size());
+                for (int i = 0; i < table.size(); i++) {
                     Comment c = new Comment();
-                    c.subject = row.select("div.subject").text();
-                    c.author = row.select("div.author").text();
-                    comments.add(c);
-                }
+                    c.subject = table.get(i).select("div.subject").text();
+                    c.author = table.get(i).select("div.author").text();
 
-                Elements table_content = document.select("table.forumpost").select("tr").select("td.content");
-                Elements attachments = document.select("table.forumpost").select("tr").select("td.content").select("div.attachments").select("a[href]");
-
-
-                for (int i = 0; i < comments.size(); i++) {
-                    Comment c = comments.get(i);
-                    c.content = table_content.get(i).select("div.posting").text();
-                    if (attachments.attr("abs:href").length() > 0) {
+                    c.content = br2nl(table_content.get(i).select("td.content > div.posting").html());
+                    if (attachments.get(i).select("td.content").select("div.attachments").select("a[href]").attr("abs:href").length() > 0) {
                         c.hasAttachment = true;
-                        String link = attachments.attr("abs:href");
-                        String text = attachments.text();
+                        String link = attachments.get(i).select("td.content").select("div.attachments").select("a[href]").attr("abs:href");
+                        String text = attachments.get(i).select("td.content").select("div.attachments").select("a[href]").text();
                         c.attachment = "<a href=\"" + link + "\">" + text + "</a>";
                     } else {
                         c.hasAttachment = false;
                     }
+                    comments.add(c);
                 }
                 return comments;
             } catch (IOException e) {
@@ -144,17 +145,29 @@ public class ThreadActivity extends SwipeBackActivity {
     public static String br2nl(String html) {
         if (html == null)
             return html;
-        Document document = null;
-        try {
-            document = Jsoup.parse(new URL(html).openStream(), "UTF-8", html);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        document.outputSettings(new Document.OutputSettings().prettyPrint(false));
+        Document document = Jsoup.parse(html);
+
+        document.outputSettings().escapeMode(Entities.EscapeMode.xhtml);
+        document.outputSettings().charset("UTF-8");
         document.select("br").append("\\n");
         document.select("p").prepend("\\n");
         String s = document.html().replaceAll("\\\\n", "\n");
-        return Jsoup.clean(s, "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false));
+
+        Document.OutputSettings outputSettings = new Document.OutputSettings();
+        outputSettings.escapeMode(Entities.EscapeMode.xhtml);
+        outputSettings.charset("UTF-8");
+        outputSettings.prettyPrint(false);
+
+        String str = Jsoup.clean(s, "", Whitelist.none(), outputSettings);
+        str = str.replaceAll("&quot;", "\"")
+                .replaceAll("&apos;", "\'")
+                .replaceAll("&lt;", "<")
+                .replaceAll("&gt;", ">")
+                .replaceAll("[\\s&&[^\\n]]+", " ")
+                .replaceAll("(?m)^\\s|\\s$", "")
+                .replaceAll("\\n+", "\n")
+                .replaceAll("^\n|\n$", "");
+        return str;
     }
 
 

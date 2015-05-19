@@ -70,7 +70,7 @@ public class MainFragment extends Fragment implements CourseAdapter.OnItemClickL
         View view = null;
         int i = getArguments().getInt(ARG_OPTION_NUMBER);
         switch (i) {
-            case 2:
+            case 3:
                 view = inflater.inflate(R.layout.fragment_course, container, false);
                 setHasOptionsMenu(false);
                 progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
@@ -91,7 +91,7 @@ public class MainFragment extends Fragment implements CourseAdapter.OnItemClickL
                 progressBar.setVisibility(ProgressBar.VISIBLE);
                 new GetCourse().execute();
                 break;
-            case 3:
+            case 4:
                 view = inflater.inflate(R.layout.fragment_submission, container, false);
                 submissionProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
                 gridView = (GridView) view.findViewById(R.id.grid_view);

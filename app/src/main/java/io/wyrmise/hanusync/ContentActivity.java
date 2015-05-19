@@ -18,6 +18,7 @@ import com.liuguangqiang.swipeback.SwipeBackLayout;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Entities;
 import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 
@@ -107,7 +108,7 @@ public class ContentActivity extends SwipeBackActivity {
                 Content first = new Content();
                 contents.add(first);
 
-                for(Element e:weekly_content){
+                for (Element e : weekly_content) {
                     Content content = new Content();
                     content.date = br2nl(e.html());
                     contents.add(content);
@@ -115,14 +116,14 @@ public class ContentActivity extends SwipeBackActivity {
 
                 Elements weekly_summary = document.select("table.weeks").select("div.summary");
 
-                try{
-                    for(int i = 0; i<weekly_summary.size();i++){
+                try {
+                    for (int i = 0; i < weekly_summary.size(); i++) {
                         Content content = contents.get(i);
                         String summary = br2nl(weekly_summary.get(i).html());
-                        if(summary.equals("")) content.summary = "No summary";
+                        if (summary.equals("")) content.summary = "No summary";
                         else content.summary = summary;
                     }
-                }catch(IndexOutOfBoundsException e){
+                } catch (IndexOutOfBoundsException e) {
 
                 }
                 return contents;
@@ -146,11 +147,28 @@ public class ContentActivity extends SwipeBackActivity {
         if (html == null)
             return html;
         Document document = Jsoup.parse(html);
-        document.outputSettings(new Document.OutputSettings().prettyPrint(false));
+
+        document.outputSettings().escapeMode(Entities.EscapeMode.xhtml);
+        document.outputSettings().charset("UTF-8");
         document.select("br").append("\\n");
         document.select("p").prepend("\\n");
         String s = document.html().replaceAll("\\\\n", "\n");
-        return Jsoup.clean(s, "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false));
+
+        Document.OutputSettings outputSettings = new Document.OutputSettings();
+        outputSettings.escapeMode(Entities.EscapeMode.xhtml);
+        outputSettings.charset("UTF-8");
+        outputSettings.prettyPrint(false);
+
+        String str = Jsoup.clean(s, "", Whitelist.none(), outputSettings);
+        str = str.replaceAll("&quot;", "\"")
+                .replaceAll("&apos;", "\'")
+                .replaceAll("&lt;", "<")
+                .replaceAll("&gt;", ">")
+                .replaceAll("[\\s&&[^\\n]]+", " ")
+                .replaceAll("(?m)^\\s|\\s$", "")
+                .replaceAll("\\n+", "\n")
+                .replaceAll("^\n|\n$", "");
+        return str;
     }
 
 
