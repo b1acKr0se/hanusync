@@ -1,0 +1,8 @@
+<resources>
+    <string name="title_activity_settings">Settings</string>
+    <string name="entry_number">Number of topics to retrieve</string>
+    <string name="entry_number_summary">Applies to General News and Marktable Collection</string>
+    <string name="general">General</string>
+
+
+</resources>

@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.liuguangqiang.swipeback.SwipeBackActivity;
 import com.liuguangqiang.swipeback.SwipeBackLayout;
@@ -37,7 +38,6 @@ public class ThreadActivity extends SwipeBackActivity {
     private RecyclerView recyclerView;
     private ThreadAdapter adapter;
     private ProgressBar progressBar;
-    private Map<String, String> cookies;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,13 +94,12 @@ public class ThreadActivity extends SwipeBackActivity {
         protected ArrayList<Comment> doInBackground(Void... params) {
             try {
                 Intent intent = getIntent();
-                cookies = (Map<String, String>) intent.getSerializableExtra("cookies");
 
                 String url = intent.getStringExtra("topic");
 
                 ArrayList<Comment> comments = new ArrayList<>();
 
-                Document document = Jsoup.connect(url).cookies(cookies).get();
+                Document document = Jsoup.connect(url).get();
 
                 Elements table = document.select("table.forumpost").select("tr.header");
                 System.out.println(table.size());
@@ -138,7 +137,8 @@ public class ThreadActivity extends SwipeBackActivity {
             if (result != null) {
                 adapter = new ThreadAdapter(result);
                 recyclerView.setAdapter(adapter);
-            }
+            } else
+                Toast.makeText(getApplicationContext(), "There's an error while trying to access the topic!", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -163,10 +163,8 @@ public class ThreadActivity extends SwipeBackActivity {
                 .replaceAll("&apos;", "\'")
                 .replaceAll("&lt;", "<")
                 .replaceAll("&gt;", ">")
-                .replaceAll("[\\s&&[^\\n]]+", " ")
-                .replaceAll("(?m)^\\s|\\s$", "")
-                .replaceAll("\\n+", "\n")
-                .replaceAll("^\n|\n$", "");
+                .replaceAll("(?m)(^ *| +(?= |$))", "")
+                .replaceAll("(?m)^$([\r\n]+?)(^$[\r\n]+?^)+", "$1");
         return str;
     }
 

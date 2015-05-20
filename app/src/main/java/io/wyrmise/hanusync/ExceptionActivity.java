@@ -16,7 +16,6 @@ import java.io.FileOutputStream;
 
 public class ExceptionActivity extends ActionBarActivity {
 
-    private Toolbar toolbar;
     private TextView exceptionTextView;
     String error = "";
 
@@ -25,7 +24,6 @@ public class ExceptionActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exception);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
         exceptionTextView = (TextView) findViewById(R.id.exceptionTextView);
 
         Intent intent = getIntent();

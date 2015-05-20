@@ -4,7 +4,9 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -323,7 +325,7 @@ public class LoginActivity extends Activity {
             mLoginFormView.setVisibility(View.GONE);
             no_internet.setVisibility(TextView.GONE);
             retry.setVisibility(Button.GONE);
-            Toast.makeText(getApplicationContext(),"Reconnecting, please wait",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Reconnecting, please wait", Toast.LENGTH_SHORT).show();
         }
 
         @Override

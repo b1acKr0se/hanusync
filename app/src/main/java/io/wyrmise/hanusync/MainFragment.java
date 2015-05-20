@@ -167,10 +167,11 @@ public class MainFragment extends Fragment implements CourseAdapter.OnItemClickL
             progressBar.setVisibility(ProgressBar.GONE);
             recyclerView.setVisibility(RecyclerView.VISIBLE);
             courseSwipeLayout.setRefreshing(false);
-            if(result.size()>0 && result!=null) {
+            if(result!=null) {
                 courseAdapter = new CourseAdapter(result, MainFragment.this);
                 recyclerView.setAdapter(courseAdapter);
-            }
+            } else
+                Toast.makeText(getActivity().getApplicationContext(), "There's an error while trying to retrive your courses!", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -216,8 +217,10 @@ public class MainFragment extends Fragment implements CourseAdapter.OnItemClickL
 
         @Override
         protected void onPostExecute(ArrayList<Submission> result) {
-            submissionList = result;
-            new GetSubmissionStatus().execute();
+            if(result!=null) {
+                submissionList = result;
+                new GetSubmissionStatus().execute();
+            }
         }
     }
 
@@ -260,7 +263,7 @@ public class MainFragment extends Fragment implements CourseAdapter.OnItemClickL
         protected void onPostExecute(Void result) {
             submissionProgressBar.setVisibility(ProgressBar.GONE);
             submissionSwipeLayout.setRefreshing(false);
-            if (submissionList.size() > 0 || submissionList != null) {
+            if (submissionList != null) {
                 gridView.setVisibility(GridView.VISIBLE);
                 submissionAdapter = new SubmissionAdapter(submissionList);
                 gridView.setAdapter(submissionAdapter);

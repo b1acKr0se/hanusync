@@ -1,6 +1,7 @@
 package io.wyrmise.hanusync;
 
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
@@ -8,14 +9,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -31,23 +31,23 @@ import java.util.Map;
 public class MainActivity extends ActionBarActivity implements CourseAdapter.OnItemClickListener, NavAdapter.OnItemClickListener {
 
     private CharSequence title;
-    String TITLES[] = {"General News","Marktable Collection", "Courses", "Submissions", "Settings", "Log out"};
-    int ICONS[] = {R.drawable.ic_action_copy,R.drawable.ic_action_copy,R.drawable.ic_action_copy,R.drawable.ic_action_paste, R.drawable.ic_action_settings, R.drawable.ic_action_undo};
+    String TITLES[] = {"General News", "Marktable Collection", "Courses", "Submissions", "Settings", "About", "Log out"};
+    int ICONS[] = {R.drawable.ic_news, R.drawable.ic_mark, R.drawable.ic_courses, R.drawable.ic_submission, R.drawable.ic_settings, R.drawable.ic_about, R.drawable.ic_exit};
     String NAME = "";
     String ID = "";
     private Toolbar toolbar;
     RecyclerView mRecyclerView;                           // Declaring RecyclerView
     RecyclerView.Adapter mAdapter;                        // Declaring Adapter For Recycler View
     RecyclerView.LayoutManager mLayoutManager;            // Declaring Layout Manager as a linear layout manager
-    DrawerLayout Drawer;                                  // Declaring DrawerLayout
+    DrawerLayout drawerLayout;                                  // Declaring DrawerLayout
     ActionBarDrawerToggle mDrawerToggle;
     private Map<String, String> cookies;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 
         setContentView(R.layout.activity_main);
 
@@ -64,8 +64,9 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
         mRecyclerView.setLayoutManager(mLayoutManager);                 // Setting the layout Manager
 
 
-        Drawer = (DrawerLayout) findViewById(R.id.drawerLayout);        // Drawer object Assigned to the view
-        mDrawerToggle = new ActionBarDrawerToggle(MainActivity.this, Drawer, toolbar, R.string.drawer_open, R.string.drawer_close) {
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);        // drawerLayout object Assigned to the view
+        drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+        mDrawerToggle = new ActionBarDrawerToggle(MainActivity.this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close) {
 
             @Override
             public void onDrawerOpened(View drawerView) {
@@ -79,8 +80,8 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
                 super.onDrawerClosed(drawerView);
                 // Code here will execute once drawer is closed
             }
-        }; // Drawer Toggle Object Made
-        Drawer.setDrawerListener(mDrawerToggle); // Drawer Listener set to the Drawer toggle
+        }; // drawerLayout Toggle Object Made
+        drawerLayout.setDrawerListener(mDrawerToggle); // drawerLayout Listener set to the drawerLayout toggle
         mDrawerToggle.syncState();               // Finally we set the drawer toggle sync State
 
         Intent intent = getIntent();
@@ -133,7 +134,7 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
     }
 
     public void onClick(View view, int position) {
-        switch(position){
+        switch (position) {
             case 1:
                 getGeneralNews(position);
                 break;
@@ -147,9 +148,16 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
                 selectItem(position);
                 break;
             case 5:
-
+                drawerLayout.closeDrawer(mRecyclerView);
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
                 break;
             case 6:
+                drawerLayout.closeDrawer(mRecyclerView);
+                Intent about = new Intent(MainActivity.this, AboutActivity.class);
+                startActivity(about);
+                break;
+            case 7:
                 showLogOutDialog();
                 break;
         }
@@ -163,13 +171,14 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
         fragment.newInstance(position);
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.content_frame, fragment);
+        fragmentTransaction.replace(R.id.content_frame, fragment,"NEWS");
         fragmentTransaction.commit();
         setTitle(TITLES[position - 1]);
-        Drawer.closeDrawer(mRecyclerView);
+        drawerLayout.closeDrawer(mRecyclerView);
     }
 
     private void showLogOutDialog() {
+        drawerLayout.closeDrawer(mRecyclerView);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Confirm");
         builder.setMessage("Are you sure you want to log out?");
@@ -188,6 +197,15 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
         dialog.show();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        NewsFragment myFragment = (NewsFragment) getFragmentManager().findFragmentByTag("NEWS");
+        if (myFragment != null && myFragment.isVisible()) {
+            myFragment.reload();
+        }
+    }
+
 
     private void selectItem(int position) {
         MainFragment fragment = new MainFragment();
@@ -200,7 +218,7 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
         fragmentTransaction.replace(R.id.content_frame, fragment);
         fragmentTransaction.commit();
         setTitle(TITLES[position - 1]);
-        Drawer.closeDrawer(mRecyclerView);
+        drawerLayout.closeDrawer(mRecyclerView);
     }
 
     public void setTitle(CharSequence title) {
@@ -219,7 +237,7 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
 
         protected void onPreExecute() {
             progressDialog = new ProgressDialog(MainActivity.this);
-            progressDialog.setMessage("Loging out, please wait...");
+            progressDialog.setMessage("Logging out, please wait...");
             progressDialog.setCancelable(false);
             progressDialog.show();
         }
@@ -230,7 +248,6 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
                 Document document = Jsoup.connect("http://fit.hanu.edu.vn/fitportal/").cookies(cookies).get();
                 Elements featureName = document.select("div.header-profileoptions").select("ul").select("li").select("a[href]");
                 String url = featureName.get(2).attr("abs:href");
-                System.out.println("Get url: "+url);
                 Jsoup.connect(url).cookies(cookies).get();
                 return true;
             } catch (IOException e) {
@@ -248,7 +265,7 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
                 finish();
                 startActivity(i);
             } else {
-                Toast.makeText(getApplicationContext(),"There's an error while trying to logging out!",Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "There's an error while trying to log out!", Toast.LENGTH_LONG).show();
             }
         }
     }

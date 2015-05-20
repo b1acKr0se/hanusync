@@ -1,16 +1,23 @@
 package io.wyrmise.hanusync;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.liuguangqiang.swipeback.SwipeBackActivity;
 import com.liuguangqiang.swipeback.SwipeBackLayout;
@@ -35,6 +42,8 @@ public class ContentActivity extends SwipeBackActivity {
     private ContentAdapter adapter;
     private ProgressBar progressBar;
     private Map<String, String> cookies;
+    private String course_url = "";
+    private String grade_url = "";
 
 
     @Override
@@ -97,11 +106,14 @@ public class ContentActivity extends SwipeBackActivity {
                 Intent intent = getIntent();
                 cookies = (Map<String, String>) intent.getSerializableExtra("cookies");
 
-                String url = intent.getStringExtra("url");
+                course_url = intent.getStringExtra("url");
 
                 ArrayList<Content> contents = new ArrayList<>();
 
-                Document document = Jsoup.connect(url).cookies(cookies).get();
+                Document document = Jsoup.connect(course_url).cookies(cookies).get();
+
+                Element grade = document.select("div.block_admin.sideblock").select("div.content").select("ul.list").select("li.r0").select("div.column.c1").select("a[href]").first();
+                grade_url = grade.attr("abs:href");
 
                 Elements weekly_content = document.select("table.weeks").select("h3.weekdates");
 
@@ -137,9 +149,12 @@ public class ContentActivity extends SwipeBackActivity {
         protected void onPostExecute(ArrayList<Content> result) {
             progressBar.setVisibility(ProgressBar.GONE);
             recyclerView.setVisibility(RecyclerView.VISIBLE);
-
-            adapter = new ContentAdapter(result);
-            recyclerView.setAdapter(adapter);
+            if(result!=null) {
+                adapter = new ContentAdapter(result);
+                recyclerView.setAdapter(adapter);
+            } else {
+                Toast.makeText(getApplicationContext(),"There's an error while trying to read the course!",Toast.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -164,16 +179,83 @@ public class ContentActivity extends SwipeBackActivity {
                 .replaceAll("&apos;", "\'")
                 .replaceAll("&lt;", "<")
                 .replaceAll("&gt;", ">")
-                .replaceAll("[\\s&&[^\\n]]+", " ")
-                .replaceAll("(?m)^\\s|\\s$", "")
-                .replaceAll("\\n+", "\n")
-                .replaceAll("^\n|\n$", "");
+                .replaceAll("(?m)(^ *| +(?= |$))", "")
+                .replaceAll("(?m)^$([\r\n]+?)(^$[\r\n]+?^)+", "$1");
         return str;
+    }
+
+    public void displayGrade() {
+        if (!grade_url.equals("")) {
+            new RetrieveGrade().execute();
+        }
+    }
+
+    private class RetrieveGrade extends AsyncTask<Void, Void, ArrayList<Grade>> {
+        ProgressDialog progressDialog;
+
+        protected void onPreExecute() {
+            progressDialog = new ProgressDialog(ContentActivity.this);
+            progressDialog.setMessage("Getting your grade...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected ArrayList<Grade> doInBackground(Void... params) {
+            try {
+                Document doc = Jsoup.connect(grade_url).cookies(cookies).get();
+
+                ArrayList<Grade> grades = new ArrayList<>();
+
+                for (Element table : doc.select("table.boxaligncenter.generaltable.user-grade")) {
+                    for (Element row : table.select("tr")) {
+                        Elements tds = row.select("td.item.b1b");
+                        Grade grade = new Grade();
+                        for (int i = 0; i < tds.size() - 1; i++) {
+                            if (i == 0)
+                                grade.name = tds.get(i).text();
+                            if (i == 1)
+                                grade.grade = tds.get(i).text();
+                            if (i == 3)
+                                grade.percentage = tds.get(i).text();
+                        }
+                        if(grade.name!=null)
+                            grades.add(grade);
+                    }
+                }
+                return grades;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<Grade> result) {
+            progressDialog.dismiss();
+            if (result != null)
+                showGradeTable(result);
+            else
+                Toast.makeText(getApplicationContext(),"There's an error while trying to get your grade, please try again.",Toast.LENGTH_LONG).show();
+        }
+    }
+
+    void showGradeTable(ArrayList<Grade> list) {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(ContentActivity.this);
+        LayoutInflater inflater = getLayoutInflater();
+        View convertView = (View) inflater.inflate(R.layout.table_layout, null);
+        alertDialog.setView(convertView);
+        ListView lv = (ListView) convertView.findViewById(R.id.gradeListView);
+        GradeAdapter adapter = new GradeAdapter(this, android.R.layout.simple_list_item_1, list);
+        lv.setAdapter(adapter);
+        alertDialog.show();
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_course, menu);
         return true;
     }
 
@@ -182,6 +264,9 @@ public class ContentActivity extends SwipeBackActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed();
+                return true;
+            case R.id.action_grade:
+                displayGrade();
                 return true;
         }
 

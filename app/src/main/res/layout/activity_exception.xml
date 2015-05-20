@@ -4,9 +4,6 @@
     android:layout_height="match_parent"
     android:background="@color/gray_default"
     tools:context="io.wyrmise.hanusync.ExceptionActivity">
-    <include
-        android:id="@+id/toolbar"
-        layout="@layout/toolbar" />
 
     <ScrollView
         android:id="@+id/exceptionScrollView"

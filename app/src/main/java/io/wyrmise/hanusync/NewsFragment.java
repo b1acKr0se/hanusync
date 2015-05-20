@@ -2,9 +2,11 @@ package io.wyrmise.hanusync;
 
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -37,7 +39,6 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnItemClickLis
     private ProgressBar progressBar;
     private SwipeRefreshLayout newsSwipeLayout;
     private RecyclerView recyclerView;
-    private Map<String, String> cookies;
     private Map<String, String> urls;
     private int number_of_topics = 10;
     private NewsAdapter newsAdapter;
@@ -56,7 +57,7 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnItemClickLis
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         int i = getArguments().getInt(ARG_NEWS_TYPE);
-        switch (i){
+        switch (i) {
             case 1:
                 news_type = 1;
                 break;
@@ -64,6 +65,9 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnItemClickLis
                 news_type = 2;
                 break;
         }
+
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+        number_of_topics = Integer.parseInt(pref.getString(SettingsActivity.KEY_ENTRY_NUM, ""));
 
         View view = inflater.inflate(R.layout.news_fragment, container, false);
         setHasOptionsMenu(false);
@@ -88,6 +92,14 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnItemClickLis
         return view;
     }
 
+    public void reload() {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+        number_of_topics = Integer.parseInt(pref.getString(SettingsActivity.KEY_ENTRY_NUM, ""));
+        progressBar.setVisibility(ProgressBar.VISIBLE);
+        recyclerView.setVisibility(RecyclerView.GONE);
+        new GetGeneralNews().execute();
+    }
+
     private void refreshNews() {
         new GetGeneralNews().execute();
     }
@@ -102,7 +114,6 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnItemClickLis
         if (urls.containsKey(topic)) {
             Intent intent = new Intent(getActivity().getApplicationContext(), ThreadActivity.class);
             intent.putExtra("topic", urls.get(topic));
-            intent.putExtra("cookies", (java.io.Serializable) cookies);
             NewsFragment.this.startActivity(intent);
         } else {
             Toast.makeText(getActivity().getApplicationContext(), "There's an error", Toast.LENGTH_LONG);
@@ -119,15 +130,14 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnItemClickLis
         protected ArrayList<News> doInBackground(Void... params) {
             try {
                 Intent intent = getActivity().getIntent();
-                cookies = (Map<String, String>) intent.getSerializableExtra("cookies");
                 Document document = null;
 
                 switch (news_type) {
                     case 1:
-                        document = Jsoup.connect("http://fit.hanu.edu.vn/fitportal/mod/forum/view.php?id=28").cookies(cookies).get();
+                        document = Jsoup.connect("http://fit.hanu.edu.vn/fitportal/mod/forum/view.php?id=28").get();
                         break;
                     case 2:
-                        document = Jsoup.connect("http://fit.hanu.edu.vn/fitportal/mod/forum/view.php?id=25").cookies(cookies).get();
+                        document = Jsoup.connect("http://fit.hanu.edu.vn/fitportal/mod/forum/view.php?id=25").get();
                         break;
                 }
 
