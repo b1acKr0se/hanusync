@@ -17,7 +17,7 @@
             android:text="@string/grade_item" />
 
         <TextView
-            android:layout_width="50dp"
+            android:layout_width="45dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:singleLine="true"

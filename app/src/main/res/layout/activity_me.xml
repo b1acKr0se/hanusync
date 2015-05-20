@@ -22,11 +22,11 @@
 
         <TextView
             android:id="@+id/my_fb"
-            style="@style/Base.TextAppearance.AppCompat.Title"
+            style="@style/TextAppearance.AppCompat.Medium"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="9dp"
+            android:layout_marginTop="8dp"
             android:layout_toRightOf="@id/facebook_icon"
             android:text="@string/facebook" />
 
@@ -62,11 +62,11 @@
 
         <TextView
             android:id="@+id/my_twitter"
-            style="@style/Base.TextAppearance.AppCompat.Title"
+            style="@style/TextAppearance.AppCompat.Medium"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="9dp"
+            android:layout_marginTop="8dp"
             android:layout_toRightOf="@id/twitter_icon"
             android:text="@string/twitter" />
 
@@ -102,11 +102,11 @@
 
         <TextView
             android:id="@+id/my_github"
-            style="@style/Base.TextAppearance.AppCompat.Title"
+            style="@style/TextAppearance.AppCompat.Medium"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="9dp"
+            android:layout_marginTop="8dp"
             android:layout_toRightOf="@id/github_icon"
             android:text="@string/github" />
 

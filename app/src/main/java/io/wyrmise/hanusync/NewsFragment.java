@@ -67,7 +67,7 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnItemClickLis
         }
 
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-        number_of_topics = Integer.parseInt(pref.getString(SettingsActivity.KEY_ENTRY_NUM, ""));
+        number_of_topics = Integer.parseInt(pref.getString(SettingsActivity.KEY_ENTRY_NUM, "10"));
 
         View view = inflater.inflate(R.layout.news_fragment, container, false);
         setHasOptionsMenu(false);
@@ -93,8 +93,9 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnItemClickLis
     }
 
     public void reload() {
+        System.out.println("reloading");
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-        number_of_topics = Integer.parseInt(pref.getString(SettingsActivity.KEY_ENTRY_NUM, ""));
+        number_of_topics = Integer.parseInt(pref.getString(SettingsActivity.KEY_ENTRY_NUM, "10"));
         progressBar.setVisibility(ProgressBar.VISIBLE);
         recyclerView.setVisibility(RecyclerView.GONE);
         new GetGeneralNews().execute();
@@ -169,7 +170,7 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnItemClickLis
             progressBar.setVisibility(ProgressBar.GONE);
             recyclerView.setVisibility(RecyclerView.VISIBLE);
             newsSwipeLayout.setRefreshing(false);
-            if (result != null || result.size() > 0) {
+            if (result != null) {
                 newsAdapter = new NewsAdapter(result, NewsFragment.this);
                 recyclerView.setAdapter(newsAdapter);
             }

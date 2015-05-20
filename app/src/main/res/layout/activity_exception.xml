@@ -3,19 +3,40 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/gray_default"
+    android:padding="10dp"
     tools:context="io.wyrmise.hanusync.ExceptionActivity">
+
+    <TextView
+        android:id="@+id/intro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/hello_world"/>
+
+    <Button
+        android:id="@+id/restart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/restart"
+        android:layout_below="@id/intro"/>
+    <Button
+        android:id="@+id/quit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/quit"
+        android:layout_below="@id/intro"
+        android:layout_marginStart="10dp"
+        android:layout_toRightOf="@id/restart"/>
 
     <ScrollView
         android:id="@+id/exceptionScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/toolbar">
+        android:layout_below="@id/restart">
 
-    <TextView
-        android:id="@+id/exceptionTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
+        <TextView
+            android:id="@+id/exceptionTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </ScrollView>
 
 </RelativeLayout>

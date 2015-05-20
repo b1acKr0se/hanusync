@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -47,6 +48,17 @@ public class LoginActivity extends Activity {
     private TextView no_internet;
     private Button retry;
 
+    private static final String PREFS_NAME = "credentials";
+    private static final String PREFS_SAVE_LOGIN = "pref_save_login";
+    private static final String PREFS_AUTO_LOGIN = "pref_auto_login";
+    private static final String PREF_UNAME = "Username";
+    private static final String PREF_PASSWORD = "Password";
+
+    private String id;
+    private String password;
+
+    static boolean isLoggedOut = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +68,8 @@ public class LoginActivity extends Activity {
         setContentView(R.layout.activity_login);
         setTheme(R.style.White);
         // Set up the login form.
+
+
         mIdView = (EditText) findViewById(R.id.email);
 
         mPasswordView = (EditText) findViewById(R.id.password);
@@ -89,6 +103,28 @@ public class LoginActivity extends Activity {
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean save_login = sharedPreferences.getBoolean(PREFS_SAVE_LOGIN, true);
+
+        if (!isLoggedOut) {
+            if (save_login)
+                loadPreferences();
+        }
+    }
+
+    private void loadPreferences() {
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME,
+                Context.MODE_PRIVATE);
+        id = settings.getString(PREF_UNAME, "");
+        password = settings.getString(PREF_PASSWORD, "");
+        mIdView.setText(id);
+        mPasswordView.setText(password);
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean auto_login = sharedPreferences.getBoolean(PREFS_AUTO_LOGIN, false);
+
+        if (auto_login)
+            new InternetCheckingAsyncTask().execute();
     }
 
     public void checkForInternet(boolean check) {
@@ -275,6 +311,7 @@ public class LoginActivity extends Activity {
                 Intent myIntent = new Intent(LoginActivity.this, MainActivity.class);
                 myIntent.putExtra("id", mId);
                 myIntent.putExtra("cookies", (java.io.Serializable) cookies);
+                savePreferences();
                 LoginActivity.this.startActivity(myIntent);
 
             } else {
@@ -289,6 +326,18 @@ public class LoginActivity extends Activity {
             showProgress(false);
         }
 
+    }
+
+    private void savePreferences() {
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME,
+                Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+
+        id = mIdView.getText().toString();
+        password = mPasswordView.getText().toString();
+        editor.putString(PREF_UNAME, id);
+        editor.putString(PREF_PASSWORD, password);
+        editor.commit();
     }
 
     private class InternetCheckingAsyncTask extends AsyncTask<Void, Void, Boolean> {
@@ -348,6 +397,12 @@ public class LoginActivity extends Activity {
             }
         }
 
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        isLoggedOut = false;
     }
 }
 

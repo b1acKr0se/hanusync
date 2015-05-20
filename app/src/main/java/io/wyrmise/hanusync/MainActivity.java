@@ -7,8 +7,10 @@ import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -42,8 +44,17 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
     DrawerLayout drawerLayout;                                  // Declaring DrawerLayout
     ActionBarDrawerToggle mDrawerToggle;
     private Map<String, String> cookies;
+    SharedPreferences prefs;
 
 
+    SharedPreferences.OnSharedPreferenceChangeListener myPrefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+            //the toolbar color
+            if (key.equals(SettingsActivity.KEY_ENTRY_NUM)) {
+                reload();
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +64,8 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.RecyclerView); // Assigning the RecyclerView Object to the xml View
 
@@ -200,6 +213,10 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
     @Override
     public void onResume() {
         super.onResume();
+        prefs.registerOnSharedPreferenceChangeListener(myPrefListener);
+    }
+
+    private void reload(){
         NewsFragment myFragment = (NewsFragment) getFragmentManager().findFragmentByTag("NEWS");
         if (myFragment != null && myFragment.isVisible()) {
             myFragment.reload();
@@ -259,6 +276,7 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
         @Override
         protected void onPostExecute(Boolean result) {
             if (result) {
+                LoginActivity.isLoggedOut = true;
                 Intent i = getBaseContext().getPackageManager()
                         .getLaunchIntentForPackage(getBaseContext().getPackageName());
                 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

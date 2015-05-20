@@ -9,7 +9,7 @@
 
     <TextView
         android:id="@+id/about_me"
-        style="@style/TextAppearance.AppCompat.Title"
+        style="@style/TextAppearance.AppCompat.Medium"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:paddingTop="13dp"
@@ -24,7 +24,7 @@
 
     <TextView
         android:id="@+id/about_open_source"
-        style="@style/TextAppearance.AppCompat.Title"
+        style="@style/TextAppearance.AppCompat.Medium"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_below="@id/divider"

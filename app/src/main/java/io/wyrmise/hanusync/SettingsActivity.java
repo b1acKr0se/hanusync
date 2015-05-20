@@ -14,6 +14,8 @@ import android.view.MenuItem;
 public class SettingsActivity extends ActionBarActivity {
     public static final String KEY_ENTRY_NUM = "pref_entry_num";
 
+
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

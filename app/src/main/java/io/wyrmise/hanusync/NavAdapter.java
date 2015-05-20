@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.Random;
+
 /**
  * Created by wyrmise on 4/6/2015.
  */
@@ -80,6 +82,25 @@ public class NavAdapter extends RecyclerView.Adapter<NavAdapter.ViewHolder> {
         } else if (viewType == TYPE_HEADER) {
 
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.header, parent, false); //Inflating the layout
+
+            ImageView header_image = (ImageView) v.findViewById(R.id.header_image);
+
+            Random r = new Random();
+            int i = r.nextInt(4-1+1)+1;
+            switch (i){
+                case 1:
+                    header_image.setImageDrawable(parent.getContext().getResources().getDrawable(R.drawable.header_1));
+                    break;
+                case 2:
+                    header_image.setImageDrawable(parent.getContext().getResources().getDrawable(R.drawable.header_2));
+                    break;
+                case 3:
+                    header_image.setImageDrawable(parent.getContext().getResources().getDrawable(R.drawable.header_3));
+                    break;
+                case 4:
+                    header_image.setImageDrawable(parent.getContext().getResources().getDrawable(R.drawable.header_4));
+                    break;
+            }
 
             ViewHolder vhHeader = new ViewHolder(v, viewType); //Creating ViewHolder and passing the object of type view
 

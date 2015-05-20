@@ -24,6 +24,7 @@ public class ExceptionHandler implements
         StringWriter stackTrace = new StringWriter();
         exception.printStackTrace(new PrintWriter(stackTrace));
         StringBuilder errorReport = new StringBuilder();
+
         errorReport.append("************ CAUSE OF ERROR ************\n\n");
         errorReport.append(stackTrace.toString());
 

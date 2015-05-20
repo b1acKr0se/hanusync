@@ -196,7 +196,7 @@ public class ContentActivity extends SwipeBackActivity {
         protected void onPreExecute() {
             progressDialog = new ProgressDialog(ContentActivity.this);
             progressDialog.setMessage("Getting your grade...");
-            progressDialog.setCancelable(false);
+            progressDialog.setCancelable(true);
             progressDialog.show();
         }
 

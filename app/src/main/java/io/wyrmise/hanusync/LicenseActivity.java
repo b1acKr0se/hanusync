@@ -27,7 +27,7 @@ public class LicenseActivity extends ActionBarActivity {
         sync.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Uri uri = Uri.parse("www.apache.org/licenses/LICENSE-2.0.html");
+                Uri uri = Uri.parse("http://www.apache.org/licenses/LICENSE-2.0.html");
                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(intent);
             }
@@ -37,7 +37,7 @@ public class LicenseActivity extends ActionBarActivity {
         android_open.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Uri uri = Uri.parse("www.apache.org/licenses/LICENSE-2.0.html");
+                Uri uri = Uri.parse("http://www.apache.org/licenses/LICENSE-2.0.html");
                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(intent);
             }
@@ -57,7 +57,7 @@ public class LicenseActivity extends ActionBarActivity {
         float_label.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Uri uri = Uri.parse("www.apache.org/licenses/LICENSE-2.0.html");
+                Uri uri = Uri.parse("http://www.apache.org/licenses/LICENSE-2.0.html");
                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(intent);
             }
@@ -67,7 +67,7 @@ public class LicenseActivity extends ActionBarActivity {
         swipe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Uri uri = Uri.parse("www.apache.org/licenses/LICENSE-2.0.html");
+                Uri uri = Uri.parse("http://www.apache.org/licenses/LICENSE-2.0.html");
                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(intent);
             }

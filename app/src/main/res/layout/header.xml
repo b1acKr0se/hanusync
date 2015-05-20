@@ -4,10 +4,11 @@
     android:layout_height="178dp">
 
     <ImageView
+        android:id="@+id/header_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:src="@drawable/header_background"/>
+        android:src="@drawable/header_1"/>
 
     <LinearLayout
         android:layout_width="match_parent"

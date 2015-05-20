@@ -18,15 +18,13 @@
             style="@style/Base.TextAppearance.AppCompat.Title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="9dp"
+            android:layout_marginTop="6dp"
             android:text="@string/app_name" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/sync_name"
-            android:layout_marginStart="10dp"
             android:text="@string/apache_license" />
     </RelativeLayout>
 
@@ -49,15 +47,13 @@
             style="@style/Base.TextAppearance.AppCompat.Title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="9dp"
+            android:layout_marginTop="6dp"
             android:text="@string/android_open_source" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/android_open_source"
-            android:layout_marginStart="10dp"
             android:text="@string/apache_license" />
     </RelativeLayout>
 
@@ -80,15 +76,13 @@
             style="@style/Base.TextAppearance.AppCompat.Title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="9dp"
+            android:layout_marginTop="6dp"
             android:text="@string/jsoup" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/jsoup_name"
-            android:layout_marginStart="10dp"
             android:text="@string/mit_license" />
     </RelativeLayout>
 
@@ -111,15 +105,13 @@
             style="@style/Base.TextAppearance.AppCompat.Title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="9dp"
+            android:layout_marginTop="6dp"
             android:text="@string/float_label" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/float_name"
-            android:layout_marginStart="10dp"
             android:text="@string/apache_license" />
     </RelativeLayout>
 
@@ -142,15 +134,13 @@
             style="@style/Base.TextAppearance.AppCompat.Title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="9dp"
+            android:layout_marginTop="6dp"
             android:text="@string/swipe_back" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/swipe_back_name"
-            android:layout_marginStart="10dp"
             android:text="@string/apache_license" />
     </RelativeLayout>
 

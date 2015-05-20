@@ -13,11 +13,11 @@
         />
     <TextView
         android:id="@+id/grade"
-        android:layout_width="50dp"
+        android:layout_width="45dp"
         android:layout_height="wrap_content"
         android:singleLine="true"
         android:layout_marginStart="10dp"
-        android:text="@string/hello_world"
+        android:text="@string/grade"
         />
     <TextView
         android:id="@+id/percentage"
