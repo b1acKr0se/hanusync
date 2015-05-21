@@ -2,10 +2,16 @@
 
 Unofficial mobile client for FIT webpage.
 
+<img src="/screenshots/1.png" alt="login screen" title="screenshot" width="270" height="486" />     <img src="/screenshots/2.png" alt="main screen" title="screenshot" width="270" height="486" />
+
 ####Features
 * Supports most forums on FIT
 
 * Quick review of file submissions
+
+* Automatically log you in
+
+* Highly customizable
 
 * Follows Google design guidelines
 
@@ -19,6 +25,8 @@ Unofficial mobile client for FIT webpage.
 * [Float Labeled EditText 0.0.6](https://github.com/wrapp/floatlabelededittext)
 
 * [SwipeBack 0.3.0](https://github.com/liuguangqiang/SwipeBack)
+
+* [Material Dialog 1.2.2](https://github.com/drakeet/MaterialDialog)
 
 ####Permissions
 
