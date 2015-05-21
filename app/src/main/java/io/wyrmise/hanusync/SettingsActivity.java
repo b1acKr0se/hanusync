@@ -13,6 +13,7 @@ import android.view.MenuItem;
 
 public class SettingsActivity extends ActionBarActivity {
     public static final String KEY_ENTRY_NUM = "pref_entry_num";
+    public static final String ENABLE_SWIPE_BACK = "pref_swipe_back";
 
 
 

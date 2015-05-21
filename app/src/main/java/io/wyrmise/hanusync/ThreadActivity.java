@@ -1,8 +1,10 @@
 package io.wyrmise.hanusync;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -44,7 +46,12 @@ public class ThreadActivity extends SwipeBackActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_thread);
 
-        setDragEdge(SwipeBackLayout.DragEdge.LEFT);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean swipe_back = sharedPreferences.getBoolean(SettingsActivity.ENABLE_SWIPE_BACK, true);
+        if (!swipe_back)
+            setDragEdge(SwipeBackLayout.DragEdge.NO);
+        else
+            setDragEdge(SwipeBackLayout.DragEdge.LEFT);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

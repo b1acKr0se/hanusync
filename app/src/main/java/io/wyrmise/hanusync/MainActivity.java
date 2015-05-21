@@ -1,13 +1,17 @@
 package io.wyrmise.hanusync;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -18,8 +22,11 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import org.jsoup.Jsoup;
@@ -27,7 +34,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 public class MainActivity extends ActionBarActivity implements CourseAdapter.OnItemClickListener, NavAdapter.OnItemClickListener {
@@ -45,7 +54,7 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
     ActionBarDrawerToggle mDrawerToggle;
     private Map<String, String> cookies;
     SharedPreferences prefs;
-
+    ImageView header_image;
 
     SharedPreferences.OnSharedPreferenceChangeListener myPrefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
@@ -104,7 +113,11 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
         if (savedInstanceState == null) {
             getGeneralNews(1);
         }
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        NavAdapter.activityResult(this,requestCode,resultCode,data);
     }
 
     private class GetInformation extends AsyncTask<Void, Void, Void> {

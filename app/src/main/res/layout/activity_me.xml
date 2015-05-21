@@ -26,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="6dp"
             android:layout_toRightOf="@id/facebook_icon"
             android:text="@string/facebook" />
 
@@ -66,7 +66,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="6dp"
             android:layout_toRightOf="@id/twitter_icon"
             android:text="@string/twitter" />
 
@@ -106,7 +106,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="6dp"
             android:layout_toRightOf="@id/github_icon"
             android:text="@string/github" />
 

@@ -3,8 +3,10 @@ package io.wyrmise.hanusync;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -15,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -33,6 +36,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
+import me.drakeet.materialdialog.MaterialDialog;
+
 
 public class ContentActivity extends SwipeBackActivity {
 
@@ -44,7 +49,7 @@ public class ContentActivity extends SwipeBackActivity {
     private Map<String, String> cookies;
     private String course_url = "";
     private String grade_url = "";
-
+    private Toast toast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +57,12 @@ public class ContentActivity extends SwipeBackActivity {
         Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
         setContentView(R.layout.activity_course);
 
-        setDragEdge(SwipeBackLayout.DragEdge.LEFT);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean swipe_back = sharedPreferences.getBoolean(SettingsActivity.ENABLE_SWIPE_BACK, true);
+        if (!swipe_back)
+            setDragEdge(SwipeBackLayout.DragEdge.NO);
+        else
+            setDragEdge(SwipeBackLayout.DragEdge.LEFT);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -149,11 +159,11 @@ public class ContentActivity extends SwipeBackActivity {
         protected void onPostExecute(ArrayList<Content> result) {
             progressBar.setVisibility(ProgressBar.GONE);
             recyclerView.setVisibility(RecyclerView.VISIBLE);
-            if(result!=null) {
+            if (result != null) {
                 adapter = new ContentAdapter(result);
                 recyclerView.setAdapter(adapter);
             } else {
-                Toast.makeText(getApplicationContext(),"There's an error while trying to read the course!",Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "There's an error while trying to read the course!", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -219,7 +229,7 @@ public class ContentActivity extends SwipeBackActivity {
                             if (i == 3)
                                 grade.percentage = tds.get(i).text();
                         }
-                        if(grade.name!=null)
+                        if (grade.name != null)
                             grades.add(grade);
                     }
                 }
@@ -236,19 +246,42 @@ public class ContentActivity extends SwipeBackActivity {
             if (result != null)
                 showGradeTable(result);
             else
-                Toast.makeText(getApplicationContext(),"There's an error while trying to get your grade, please try again.",Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "There's an error while trying to get your grade, please try again.", Toast.LENGTH_LONG).show();
         }
     }
 
     void showGradeTable(ArrayList<Grade> list) {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(ContentActivity.this);
+        MaterialDialog mMaterialDialog = new MaterialDialog(ContentActivity.this);
         LayoutInflater inflater = getLayoutInflater();
         View convertView = (View) inflater.inflate(R.layout.table_layout, null);
-        alertDialog.setView(convertView);
-        ListView lv = (ListView) convertView.findViewById(R.id.gradeListView);
+        mMaterialDialog.setView(convertView);
+        final ListView lv = (ListView) convertView.findViewById(R.id.gradeListView);
         GradeAdapter adapter = new GradeAdapter(this, android.R.layout.simple_list_item_1, list);
         lv.setAdapter(adapter);
-        alertDialog.show();
+
+        toast = Toast.makeText(this,"Press on an item to view its full name",Toast.LENGTH_LONG);
+        toast.show();
+
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Grade grade = (Grade) lv.getAdapter().getItem(position);
+                if(toast==null){
+                    toast = Toast.makeText(getApplicationContext(),grade.name,Toast.LENGTH_SHORT);
+                    toast.show();
+                    System.out.println("toast is null");
+                } else {
+                    System.out.println("toast is not null");
+                    toast.cancel();
+                    toast = Toast.makeText(getApplicationContext(),grade.name,Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            }
+        });
+
+        mMaterialDialog.setCanceledOnTouchOutside(true);
+        mMaterialDialog.show();
+
     }
 
 

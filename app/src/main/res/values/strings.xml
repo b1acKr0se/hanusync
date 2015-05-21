@@ -47,5 +47,7 @@
     <string name="save_login_summary">Save your next login credentials</string>
     <string name="auto_login">Auto login</string>
     <string name="auto_login_summary">Log you in automatically using your saved id and password</string>
-
+    <string name="ui">UI</string>
+    <string name="enable_swipe_back">Enable swipe left to go back</string>
+    <string name="swipe_back_summary">Available in some certain screen</string>
 </resources>
