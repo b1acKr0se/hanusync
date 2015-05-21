@@ -4,7 +4,7 @@ package io.wyrmise.hanusync;
 import android.support.v7.widget.RecyclerView;
 
 public abstract class HidingScrollListener extends RecyclerView.OnScrollListener {
-    private static final int HIDE_THRESHOLD = 40;
+    private static final int HIDE_THRESHOLD = 20;
     private int scrolledDistance = 0;
     private boolean controlsVisible = true;
 

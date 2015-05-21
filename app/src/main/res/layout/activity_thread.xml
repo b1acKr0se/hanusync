@@ -4,9 +4,6 @@
     android:background="@color/sepia"
     android:fitsSystemWindows="true">
 
-    <include
-        android:id="@+id/toolbar"
-        layout="@layout/toolbar" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/commentList"
@@ -14,6 +11,18 @@
         android:layout_height="match_parent"
         android:background="@color/gray_default"
         />
+
+    <android.support.v7.widget.Toolbar
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/sepia"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark"
+        app:titleTextAppearance="@style/AppTheme.Toolbar.Title"
+        app:theme="@style/AppTheme.Toolbar"
+        android:elevation="4dp"
+        android:layout_above="@id/commentList" />
 
     <ProgressBar
         android:id="@+id/progressBar"

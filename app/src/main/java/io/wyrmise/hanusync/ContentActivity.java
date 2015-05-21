@@ -41,7 +41,6 @@ import me.drakeet.materialdialog.MaterialDialog;
 
 public class ContentActivity extends SwipeBackActivity {
 
-
     private Toolbar toolbar;
     private RecyclerView recyclerView;
     private ContentAdapter adapter;
@@ -68,6 +67,8 @@ public class ContentActivity extends SwipeBackActivity {
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        System.out.println(toolbar==null);
 
         Intent intent = getIntent();
         String name = intent.getStringExtra("subject");
