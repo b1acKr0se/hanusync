@@ -6,10 +6,10 @@ android {
 
     defaultConfig {
         applicationId "io.wyrmise.hanusync"
-        minSdkVersion 19
+        minSdkVersion 16
         targetSdkVersion 21
         versionCode 1
-        versionName "1.2r"
+        versionName "1.2.3"
     }
     buildTypes {
         release {

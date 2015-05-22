@@ -96,7 +96,7 @@ public class LoginActivity extends Activity {
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                new InternetCheckingAsyncTask().execute();
+                attemptLogin();
             }
         });
 
@@ -144,11 +144,14 @@ public class LoginActivity extends Activity {
         try {
             Process ipProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
             int exitValue = ipProcess.waitFor();
+            System.out.println(exitValue);
             return (exitValue == 0);
 
         } catch (IOException e) {
+            System.out.println("IO Exception");
             e.printStackTrace();
         } catch (InterruptedException e) {
+            System.out.println("InterruptedException Exception");
             e.printStackTrace();
         }
 
