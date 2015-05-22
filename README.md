@@ -2,7 +2,10 @@
 
 Unofficial mobile client for FIT webpage.
 
-<img src="/screenshots/1.png" alt="login screen" title="screenshot" width="270" height="486" />     <img src="/screenshots/2.png" alt="main screen" title="screenshot" width="270" height="486" />
+<img src="/screenshots/presentation1.png" alt="screenshot" title="screenshot" width="270" height="450"/> 
+<img src="/screenshots/presentation2.png" alt="screenshot" title="screenshot" width="270" height="450"/> 
+<img src="/screenshots/presentation3.png" alt="screenshot" title="screenshot" width="270" height="450"/> 
+<img src="/screenshots/presentation4.png" alt="screenshot" title="screenshot" width="270" height="450"/>
 
 ####Features
 * Supports most forums on FIT
@@ -31,8 +34,6 @@ Unofficial mobile client for FIT webpage.
 ####Permissions
 
 * ````INTERNET````: For accessing the internet
-
-* ````WRITE_EXTERNAL_STORAGE````: For writing logcat to local file
 
 ####The Code
 
