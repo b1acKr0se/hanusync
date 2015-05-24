@@ -27,7 +27,7 @@ Unofficial mobile client for FIT webpage.
 
 * [Float Labeled EditText 0.0.6](https://github.com/wrapp/floatlabelededittext)
 
-* [SwipeBack 0.3.0](https://github.com/liuguangqiang/SwipeBack)
+* [SwipeBackLayout 1.0.0](https://github.com/ikew0ng/SwipeBackLayout)
 
 * [Material Dialog 1.2.2](https://github.com/drakeet/MaterialDialog)
 
