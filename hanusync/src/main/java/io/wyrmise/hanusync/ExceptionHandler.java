@@ -7,6 +7,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 
+import io.wyrmise.hanusync.activities.ExceptionActivity;
+
 /**
  * Created by Demise on 5/18/2015.
  */

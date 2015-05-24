@@ -38,7 +38,7 @@
     <string name="android_open_source">Android Open Source Project</string>
     <string name="jsoup">jsoup: HTML Parser</string>
     <string name="float_label">Float Labeled EditText</string>
-    <string name="swipe_back">SwipeBack</string>
+    <string name="swipe_back">SwipeBackLayout</string>
     <string name="apache_license">Apache License 2.0</string>
     <string name="mit_license">MIT License</string>
     <string name="restart">Restart</string>
@@ -48,6 +48,6 @@
     <string name="auto_login">Auto login</string>
     <string name="auto_login_summary">Log you in automatically using your saved id and password</string>
     <string name="ui">UI</string>
-    <string name="enable_swipe_back">Enable swipe left to go back</string>
+    <string name="enable_swipe_back">Enable swiping the left edge to go back</string>
     <string name="swipe_back_summary">Available in some certain screen</string>
 </resources>

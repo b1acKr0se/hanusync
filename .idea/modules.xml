@@ -4,7 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/HanuSync.iml" filepath="$PROJECT_DIR$/HanuSync.iml" />
       <module fileurl="file://$PROJECT_DIR$/hanusync/hanusync.iml" filepath="$PROJECT_DIR$/hanusync/hanusync.iml" />
-      <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" />
     </modules>
   </component>
 </project>

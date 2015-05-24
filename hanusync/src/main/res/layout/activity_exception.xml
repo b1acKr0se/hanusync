@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="@color/gray_default"
     android:padding="10dp"
-    tools:context="io.wyrmise.hanusync.ExceptionActivity">
+    tools:context="io.wyrmise.hanusync.activities.ExceptionActivity">
 
     <TextView
         android:id="@+id/intro"

@@ -5,7 +5,7 @@
     android:background="@color/gray_default"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    tools:context="io.wyrmise.hanusync.MeActivity">
+    tools:context="io.wyrmise.hanusync.activities.MeActivity">
 
     <RelativeLayout
         android:id="@+id/facebook"

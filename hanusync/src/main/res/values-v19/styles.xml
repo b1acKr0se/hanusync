@@ -14,7 +14,7 @@
         <item name="colorAccent">@color/dark_sepia</item>
 
         <item name="android:windowBackground">@color/sepia</item>
-
+        <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
