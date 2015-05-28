@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -110,7 +111,7 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        NavAdapter.activityResult(this,requestCode,resultCode,data);
+        NavAdapter.activityResult(this, requestCode, resultCode, data);
     }
 
     private class GetInformation extends AsyncTask<Void, Void, Void> {
@@ -138,7 +139,7 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
 
         @Override
         protected void onPostExecute(Void result) {
-            mAdapter = new NavAdapter(TITLES, ICONS, NAME, ID, MainActivity.this);
+            mAdapter = new NavAdapter(getApplicationContext(), TITLES, ICONS, NAME, ID, MainActivity.this);
             mRecyclerView.setAdapter(mAdapter);
         }
     }
@@ -168,16 +169,34 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
                 break;
             case 5:
                 drawerLayout.closeDrawer(mRecyclerView);
-                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-                startActivity(intent);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                        startActivity(intent);
+                    }
+                }, 200);
+
                 break;
             case 6:
                 drawerLayout.closeDrawer(mRecyclerView);
-                Intent about = new Intent(MainActivity.this, AboutActivity.class);
-                startActivity(about);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent about = new Intent(MainActivity.this, AboutActivity.class);
+                        startActivity(about);
+                    }
+                }, 200);
+
                 break;
             case 7:
-                showLogOutDialog();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        showLogOutDialog();
+                    }
+                }, 200);
+
                 break;
         }
     }
@@ -190,7 +209,7 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
         fragment.newInstance(position);
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.content_frame, fragment,"NEWS");
+        fragmentTransaction.replace(R.id.content_frame, fragment, "NEWS");
         fragmentTransaction.commit();
         setTitle(TITLES[position - 1]);
         drawerLayout.closeDrawer(mRecyclerView);
@@ -222,7 +241,7 @@ public class MainActivity extends ActionBarActivity implements CourseAdapter.OnI
         prefs.registerOnSharedPreferenceChangeListener(myPrefListener);
     }
 
-    private void reload(){
+    private void reload() {
         NewsFragment myFragment = (NewsFragment) getFragmentManager().findFragmentByTag("NEWS");
         if (myFragment != null && myFragment.isVisible()) {
             myFragment.reload();

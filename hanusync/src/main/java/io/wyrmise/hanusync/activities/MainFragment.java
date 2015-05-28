@@ -174,7 +174,7 @@ public class MainFragment extends Fragment implements CourseAdapter.OnItemClickL
             recyclerView.setVisibility(RecyclerView.VISIBLE);
             courseSwipeLayout.setRefreshing(false);
             if(result!=null) {
-                courseAdapter = new CourseAdapter(result, MainFragment.this);
+                courseAdapter = new CourseAdapter(getActivity().getApplicationContext(),result, MainFragment.this);
                 recyclerView.setAdapter(courseAdapter);
             } else
                 Toast.makeText(getActivity().getApplicationContext(), "There's an error while trying to retrive your courses!", Toast.LENGTH_LONG).show();

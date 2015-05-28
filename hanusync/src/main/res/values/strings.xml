@@ -48,6 +48,6 @@
     <string name="auto_login">Auto login</string>
     <string name="auto_login_summary">Log you in automatically using your saved id and password</string>
     <string name="ui">UI</string>
-    <string name="enable_swipe_back">Enable swiping the left edge to go back</string>
+    <string name="enable_swipe_back">Enable swiping to go back</string>
     <string name="swipe_back_summary">Available in some certain screen</string>
 </resources>

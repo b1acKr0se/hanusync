@@ -169,7 +169,7 @@ public class ContentActivity extends MySwipeBackActivity {
             progressBar.setVisibility(ProgressBar.GONE);
             recyclerView.setVisibility(RecyclerView.VISIBLE);
             if (result != null) {
-                adapter = new ContentAdapter(result);
+                adapter = new ContentAdapter(getApplicationContext(),result);
                 recyclerView.setAdapter(adapter);
             } else {
                 Toast.makeText(getApplicationContext(), "There's an error while trying to read the course!", Toast.LENGTH_LONG).show();

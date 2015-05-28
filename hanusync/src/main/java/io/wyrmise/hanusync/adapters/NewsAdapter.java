@@ -1,9 +1,13 @@
 package io.wyrmise.hanusync.adapters;
 
+import android.content.Context;
+import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -16,10 +20,14 @@ import io.wyrmise.hanusync.objects.News;
  */
 public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder> {
 
+    private Context context;
     private ArrayList<News> newsList;
     OnItemClickListener mListener;
+    private int lastPosition = -1;
 
-    public NewsAdapter(ArrayList<News> list, OnItemClickListener listener) {
+
+    public NewsAdapter(Context context, ArrayList<News> list, OnItemClickListener listener) {
+        this.context = context;
         newsList = list;
         mListener = listener;
     }
@@ -56,11 +64,24 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
         String str = newsList.get(i).reply_number > 1 ? " replies" : " reply";
         newsViewHolder.reply_num.setText(newsList.get(i).reply_number + str);
 
+        setAnimation(newsViewHolder.view, i);
+
         newsViewHolder.view.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 mListener.onClick(view, i);
             }
         });
+    }
+
+    private void setAnimation(View viewToAnimate, int position)
+    {
+        // If the bound view wasn't previously displayed on screen, it's animated
+        if (position > lastPosition)
+        {
+            Animation animation = AnimationUtils.loadAnimation(context, android.R.anim.slide_in_left);
+            viewToAnimate.startAnimation(animation);
+            lastPosition = position;
+        }
     }
 
     public static class NewsViewHolder extends RecyclerView.ViewHolder {
@@ -72,6 +93,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
         public NewsViewHolder(View v) {
             super(v);
             view = v;
+            view.setClickable(true);
             topic = (TextView) v.findViewById(R.id.topic);
             author = (TextView) v.findViewById(R.id.author);
             reply_num = (TextView) v.findViewById(R.id.reply_num);

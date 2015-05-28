@@ -5,8 +5,10 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -28,6 +30,7 @@ import io.wyrmise.hanusync.R;
  */
 public class NavAdapter extends RecyclerView.Adapter<NavAdapter.ViewHolder> {
 
+    private Context context;
     private static final int TYPE_HEADER = 0;  // Declaring Variable to Understand which View is being worked on
     // IF the view under inflation and population is header or Item
     private static final int TYPE_ITEM = 1;
@@ -36,8 +39,10 @@ public class NavAdapter extends RecyclerView.Adapter<NavAdapter.ViewHolder> {
     private String name;        //String Resource for header View Name
     private String id;       //String Resource for header view email
     private OnItemClickListener mListener;
+    private int selectedPosition = 1;
     static ImageView header_image;
     static String path = "";
+    ColorStateList oldColors;
 
 
     /**
@@ -71,7 +76,8 @@ public class NavAdapter extends RecyclerView.Adapter<NavAdapter.ViewHolder> {
         }
     }
 
-    public NavAdapter(String Titles[], int Icons[], String Name, String id, OnItemClickListener listener) { // MyAdapter Constructor with titles and icons parameter
+    public NavAdapter(Context c, String Titles[], int Icons[], String Name, String id, OnItemClickListener listener) { // MyAdapter Constructor with titles and icons parameter
+        context = c;
         mNavTitles = Titles;
         mIcons = Icons;
         name = Name;
@@ -104,9 +110,9 @@ public class NavAdapter extends RecyclerView.Adapter<NavAdapter.ViewHolder> {
 
             SharedPreferences image = parent.getContext().getSharedPreferences("user_image",
                     Context.MODE_PRIVATE);
-            path = image.getString("path","");
+            path = image.getString("path", "");
 
-            if(path.equals("")) {
+            if (path.equals("")) {
                 Random r = new Random();
                 int i = r.nextInt(4 - 1 + 1) + 1;
                 switch (i) {
@@ -161,7 +167,7 @@ public class NavAdapter extends RecyclerView.Adapter<NavAdapter.ViewHolder> {
             if (extra != null) {
                 System.out.println("Change image");
                 Bitmap photo = extra.getParcelable("data");
-                path = saveToInternalSorage(context,photo);
+                path = saveToInternalSorage(context, photo);
                 header_image.setImageBitmap(photo);
             }
         }
@@ -212,6 +218,12 @@ public class NavAdapter extends RecyclerView.Adapter<NavAdapter.ViewHolder> {
             // position by 1 and pass it to the holder while setting the text and image
             holder.textView.setText(mNavTitles[position - 1]); // Setting the Text with the array of our Titles
             holder.imageView.setImageResource(mIcons[position - 1]);// Setting the image with array of our icons
+            oldColors = holder.textView.getTextColors();
+
+            if (selectedPosition == position)
+                holder.textView.setTextColor(context.getResources().getColor(R.color.sepia));
+            else
+                holder.textView.setTextColor(oldColors);
 
         } else {
             holder.Name.setText(name);
@@ -221,7 +233,13 @@ public class NavAdapter extends RecyclerView.Adapter<NavAdapter.ViewHolder> {
         holder.view.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 mListener.onClick(view, position);
+                if (position <= 4) {
+                    notifyItemChanged(selectedPosition);
+                    selectedPosition = position;
+                    notifyItemChanged(selectedPosition);
+                }
             }
+
         });
     }
 

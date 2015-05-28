@@ -143,7 +143,7 @@ public class ThreadActivity extends MySwipeBackActivity {
             progressBar.setVisibility(ProgressBar.GONE);
             recyclerView.setVisibility(RecyclerView.VISIBLE);
             if (result != null) {
-                adapter = new ThreadAdapter(result);
+                adapter = new ThreadAdapter(getApplicationContext(),result);
                 recyclerView.setAdapter(adapter);
             } else
                 Toast.makeText(getApplicationContext(), "There's an error while trying to access the topic!", Toast.LENGTH_LONG).show();

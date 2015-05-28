@@ -132,7 +132,6 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnItemClickLis
         @Override
         protected ArrayList<News> doInBackground(Void... params) {
             try {
-                Intent intent = getActivity().getIntent();
                 Document document = null;
 
                 switch (news_type) {
@@ -173,7 +172,7 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnItemClickLis
             recyclerView.setVisibility(RecyclerView.VISIBLE);
             newsSwipeLayout.setRefreshing(false);
             if (result != null) {
-                newsAdapter = new NewsAdapter(result, NewsFragment.this);
+                newsAdapter = new NewsAdapter(getActivity().getApplicationContext(),result, NewsFragment.this);
                 recyclerView.setAdapter(newsAdapter);
             }
         }

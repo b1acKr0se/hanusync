@@ -19,8 +19,6 @@ public class SubmissionAdapter extends BaseAdapter{
 
     private ArrayList<Submission> submissions;
 
-    private static final int SUBMISSION_PENDING = 1;
-
     private static final int SUBMISSION_SUBMITTED = 2;
 
     public SubmissionAdapter(ArrayList<Submission> list){
